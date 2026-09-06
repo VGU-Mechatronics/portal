@@ -41,10 +41,12 @@ export type PortalTabId = typeof PORTAL_TABS[number]['id'];
 
 export const EXAM_CARDS: PortalCard[] = [
   {
-    title: "Step-back/Retake Registration Form",
-    description: "Formally withdraw from an enrolled course or cancel your exam registration under approved regulations.",
-    type: "FORM",
-    url: "https://forms.gle/CkecUGbfnLmz5E5u6"
+    title: "Exam Attendence List_WS2026",
+    description: "Official finalized examination attendance roster and student room assignments for Winter Semester 2026.",
+    type: "LINK",
+    url: "#",
+    isTba: true,
+    statusTag: "Upcoming"
   },
   {
     title: "Exam Inspection Request",
@@ -101,7 +103,7 @@ export interface StudentListResource {
 }
 
 export const STUDENT_LIST_RESOURCE: StudentListResource = {
-  title: "Student List",
+  title: "Student List_WS2026",
   subtitle: "Official student intake rosters, class registrations & group allocations",
   cohort: "Official Roster",
   url: "https://docs.google.com/spreadsheets/d/178P07YRBWgoGiOgCbltsb-ELi536tn_s3vSif-_uZsk/edit?usp=sharing",
@@ -153,10 +155,17 @@ export const FORM_CARDS: PortalCard[] = [
     isTba: true
   },
   {
-    title: "Retake Exam Registration Form",
-    description: "Sign up for subsequent exam iterations or remedial laboratory blocks for failed components.",
+    title: "Step-back/Retake Exam Registration Form",
+    description: "Formally withdraw from an enrolled course or register for retake exam iterations under approved academic regulations.",
     type: "FORM",
-    url: "https://forms.gle/HeqZv92mppRtYxka9"
+    url: "https://forms.gle/CkecUGbfnLmz5E5u6"
+  },
+  {
+    title: "Oral Exam Registration Form",
+    description: "Formal registration form for students requesting an oral supplementary examination.",
+    type: "FORM",
+    url: DUMMY_FORM_URL,
+    isTba: true
   }
 ];
 

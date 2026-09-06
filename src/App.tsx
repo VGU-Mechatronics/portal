@@ -42,7 +42,13 @@ import {
   X,
   History,
   Scale,
-  ArrowRight
+  ArrowRight,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  AlertTriangle,
+  RotateCcw,
+  Ban
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import PortalCardComponent from './components/PortalCardComponent';
@@ -79,14 +85,28 @@ export interface SearchItem {
 
 const SEARCH_POOL: SearchItem[] = [
   {
-    title: 'Student List - Official Cohort Rosters & Enrolled Class Members',
+    title: 'Student List_WS2026 - Official Cohort Rosters & Enrolled Class Members',
     description: 'Official student intake rosters, class registrations and cohort group allocations for the MEC program',
     type: 'LINK' as const,
     category: 'Schedules & Exams',
     url: STUDENT_LIST_RESOURCE.url
   },
   {
-    title: 'Article 19. Evaluation of Examinations - German & Vietnamese Grade Conversion Scale',
+    title: 'A. Retake Exam Registration - Regulations & Deadlines',
+    description: 'Deadline is 7 days before exam date. Who can & cannot register for retake exams, compulsory attendance upon finalized list.',
+    type: 'FORM' as const,
+    category: 'Schedules & Exams',
+    url: 'https://forms.gle/CkecUGbfnLmz5E5u6'
+  },
+  {
+    title: 'B. Step-back from a Final Exam - Instructions & Opt-out Form',
+    description: 'Default inclusion in tentative list, submit form 7 days before exam to step back. Failure to attend finalized exam results in 5.0.',
+    type: 'FORM' as const,
+    category: 'Schedules & Exams',
+    url: 'https://forms.gle/CkecUGbfnLmz5E5u6'
+  },
+  {
+    title: 'Evaluation of Examinations - German & Vietnamese Grade Conversion Scale',
     description: 'Official linear calibration between German grading scale (1.0 - 5.0) and Vietnamese 10-point scale based on academic achievement %',
     type: 'LINK' as const,
     category: 'Curriculum & Regulations',
@@ -98,6 +118,20 @@ const SEARCH_POOL: SearchItem[] = [
     type: 'LINK' as const,
     category: 'Curriculum & Regulations',
     url: '#section-grade-conversion-table'
+  },
+  {
+    title: 'Retake Exam Regulations',
+    description: 'No retakes for passed modules, maximum 2 retakes (3 total attempts), conclusively unsuccessful dismissal, and cumulative failed attempts tracking',
+    type: 'LINK' as const,
+    category: 'Curriculum & Regulations',
+    url: '#section-retake-exams-regulations'
+  },
+  {
+    title: 'Oral Supplementary Examination',
+    description: 'Grade rescue opportunity for failed written or take-home exams (5.0 to 4.0), max 1/module & 3/degree, written application within 4 weeks',
+    type: 'LINK' as const,
+    category: 'Curriculum & Regulations',
+    url: '#section-oral-assessment-regulations'
   },
   ...FORM_CARDS.map(c => ({ ...c, category: 'Forms & Petitions' as string })),
   ...EXAM_CARDS.map(c => ({ ...c, category: 'Exam Administrative Forms' as string })),
@@ -111,11 +145,12 @@ const SEARCH_POOL: SearchItem[] = [
   })),
   ...CURRICULUM_CARDS.map(c => ({ ...c, category: 'Curriculum & Handbooks' as string })),
   ...REGULATION_CARDS.map(c => ({ ...c, category: 'Academic Regulations' as string })),
-  ...INTERNSHIP_CARDS.map(c => ({ ...c, category: 'Internship Documents' as string })),
-  ...THESIS_CARDS.map(c => ({ ...c, category: 'Bachelor Thesis Milestones' as string })),
-  ...GRADUATION_CARDS.map(c => ({ ...c, category: 'Graduation Checklists' as string })),
-  ...SCHOLARSHIP_CARDS.map(c => ({ ...c, category: 'Scholarships & Grants' as string })),
-  ...EXCHANGE_CARDS.map(c => ({ ...c, category: 'HAW Hamburg Exchange' as string })),
+  // Temporarily hidden per user request (will be updated later)
+  // ...INTERNSHIP_CARDS.map(c => ({ ...c, category: 'Internship Documents' as string })),
+  // ...THESIS_CARDS.map(c => ({ ...c, category: 'Bachelor Thesis Milestones' as string })),
+  // ...GRADUATION_CARDS.map(c => ({ ...c, category: 'Graduation Checklists' as string })),
+  // ...SCHOLARSHIP_CARDS.map(c => ({ ...c, category: 'Scholarships & Grants' as string })),
+  // ...EXCHANGE_CARDS.map(c => ({ ...c, category: 'HAW Hamburg Exchange' as string })),
   ...FAQ_ITEMS.map(f => ({
     title: f.question,
     description: f.answer,
@@ -141,6 +176,8 @@ export default function App() {
   const [selectedCurriculumYear, setSelectedCurriculumYear] = useState<string>('all');
   const [selectedMajor, setSelectedMajor] = useState<string>('robotics');
   const [isArchiveExpanded, setIsArchiveExpanded] = useState<boolean>(false);
+  const [isRetakeRulesExpanded, setIsRetakeRulesExpanded] = useState<boolean>(true);
+  const [isStepBackRulesExpanded, setIsStepBackRulesExpanded] = useState<boolean>(true);
   
   // Interactive Merit Scholarship Checklist states
   const [chkPassedAll, setChkPassedAll] = useState<boolean>(false);
@@ -189,6 +226,13 @@ export default function App() {
     }
   }, [activeTab]);
 
+  // Guard against navigating to disabled tabs (will be updated later)
+  useEffect(() => {
+    if (activeTab === 'internship-thesis' || activeTab === 'scholarship-exchange') {
+      setActiveTab('guidelines');
+    }
+  }, [activeTab]);
+
   const handleItemClick = (item: SearchItem) => {
     let targetTab: PortalTabId = 'guidelines';
     if (item.category === 'Forms & Petitions') targetTab = 'forms';
@@ -196,11 +240,6 @@ export default function App() {
     else if (item.category === 'Schedules') targetTab = 'schedules-exams';
     else if (item.category === 'Curriculum & Handbooks') targetTab = 'curriculum-regulations';
     else if (item.category === 'Academic Regulations') targetTab = 'curriculum-regulations';
-    else if (item.category === 'Internship Documents') targetTab = 'internship-thesis';
-    else if (item.category === 'Bachelor Thesis Milestones') targetTab = 'internship-thesis';
-    else if (item.category === 'Graduation Checklists') targetTab = 'internship-thesis';
-    else if (item.category === 'Scholarships & Grants') targetTab = 'scholarship-exchange';
-    else if (item.category === 'HAW Hamburg Exchange') targetTab = 'scholarship-exchange';
     else if (item.category === 'Frequently Asked Questions') targetTab = 'faq';
 
     setActiveTab(targetTab);
@@ -418,6 +457,13 @@ export default function App() {
     "Prerequisites for taking final exams".toLowerCase().includes(query) ||
     "In order to qualify for the final examinations under the joint MEC regulatory code: Students must satisfy the mandatory lecture attendance rate of at least 80%. Laboratory attendance is strictly mandatory at 100%—all practical blocks must be fully passed. Satisfactory grades must be obtained on all homework, midterms, or project reports.".toLowerCase().includes(query);
 
+  const examRulesMatches = !query ||
+    "a. retake exam registration".includes(query) ||
+    "b. step-back from a final exam".includes(query) ||
+    "retake exam registration deadline 7 days teaching plan failed stepped back banned attendance 5.0".includes(query) ||
+    "step-back from a final exam tentative final exam list stepping back attendance compulsory".includes(query) ||
+    "thi lai thi lại step back rut mon huy thi hoan thi".includes(query);
+
   const curriculumOverviewMatches = !query ||
     "Core Engineering Curriculum Overview".toLowerCase().includes(query) ||
     "The Mechatronics program is meticulously aligned with HAW Hamburg accreditation standards. It spans over 4 academic years (7-8 semesters), covering fundamental sciences, electrical systems, control loops, and robotics, culminating in a dual-degree Bachelor of Science award.".toLowerCase().includes(query) ||
@@ -432,6 +478,29 @@ export default function App() {
     "Basic Internship".toLowerCase().includes(query) ||
     "semester 4 progression".toLowerCase().includes(query) ||
     "VGU ASA by 15.08".toLowerCase().includes(query);
+
+  const retakeRegulationsMatches = !query ||
+    "quy định về thi lại (retake exams)".toLowerCase().includes(query) ||
+    "retake exam regulations wiederholungsprüfungen".toLowerCase().includes(query) ||
+    "no retakes for passed modules".toLowerCase().includes(query) ||
+    "maximum number of retakes max 2 retakes".toLowerCase().includes(query) ||
+    "conclusively unsuccessful endgültig nicht bestanden".toLowerCase().includes(query) ||
+    "cumulative tracking of failed attempts".toLowerCase().includes(query) ||
+    "oral supplementary examination mündliche ergänzungsprüfung".toLowerCase().includes(query) ||
+    "grade rescue objective 5.0 to 4.0 sufficient".toLowerCase().includes(query) ||
+    "not counted as a retake attempt".toLowerCase().includes(query) ||
+    "frequency lifetime limits 3 times bachelor".toLowerCase().includes(query) ||
+    "written application deadline 4 weeks".toLowerCase().includes(query) ||
+    "exclusion criteria academic misconduct cheating disruption".toLowerCase().includes(query) ||
+    "thi lại retake không thi lại môn đã đỗ".toLowerCase().includes(query) ||
+    "số lần thi lại tối đa 2 lần tổng cộng 3 cơ hội".toLowerCase().includes(query) ||
+    "đánh giá trượt vĩnh viễn conclusively unsuccessful endgültig không đạt".toLowerCase().includes(query) ||
+    "tính gộp số lần trượt haw hamburg".toLowerCase().includes(query) ||
+    "vấn đáp bổ sung cứu điểm trượt oral assessment mündliche ergänzungsprüfung".toLowerCase().includes(query) ||
+    "cứu điểm trượt 5.0 nâng lên 4.0 sufficient".toLowerCase().includes(query) ||
+    "không tính là một lần thi lại tối đa 1 lần mỗi môn 3 lần cả chương trình bachelor".toLowerCase().includes(query) ||
+    "thời hạn nộp đơn 4 tuần thời lượng 15 đến 45 phút".toLowerCase().includes(query) ||
+    "trường hợp loại trừ gian lận quay cóp gây rối".toLowerCase().includes(query);
 
   const thesisOverviewMatches = !query ||
     "Bachelor Thesis Guidelines".toLowerCase().includes(query) ||
@@ -488,19 +557,20 @@ export default function App() {
 
   const getTabMatchesCount = (tabId: string) => {
     if (!query) return 0;
+    if (tabId === 'internship-thesis' || tabId === 'scholarship-exchange') return 0;
     switch (tabId) {
       case 'guidelines':
         return filteredInfoChannels.length;
       case 'schedules-exams':
         return filteredScheduleCards.length + filteredExamCards.length;
       case 'curriculum-regulations':
-        return filteredCurriculumCards.length + filteredRegulationCards.length + (gradeConversionMatches ? 1 : 0);
+        return filteredCurriculumCards.length + filteredRegulationCards.length + (gradeConversionMatches ? 1 : 0) + (retakeRegulationsMatches ? 1 : 0);
       case 'forms':
         return filteredFormCards.length;
       case 'internship-thesis':
-        return filteredThesisCards.length + filteredInternshipCards.length + filteredGraduationCards.length;
+        return 0;
       case 'scholarship-exchange':
-        return filteredScholarshipCards.length + filteredExchangeCards.length + (scholarshipOverviewMatches ? 1 : 0);
+        return 0;
       case 'faq':
         return filteredFaqItems.length;
       default:
@@ -793,24 +863,36 @@ export default function App() {
                 {PORTAL_TABS.map((tab) => {
                   const isActive = activeTab === tab.id;
                   const tabMatches = getTabMatchesCount(tab.id);
+                  const isPendingTab = tab.id === 'internship-thesis' || tab.id === 'scholarship-exchange';
                   
                   return (
                     <button
                       key={tab.id}
                       id={`nav-btn-${tab.id}`}
-                      onClick={() => setActiveTab(tab.id)}
-                      className={`group flex items-center space-x-2 px-2.5 py-1.5 rounded-lg text-xs md:text-sm font-semibold whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-102 active:scale-95 cursor-pointer flex-shrink-0 border ${
-                        isActive
+                      onClick={() => {
+                        if (!isPendingTab) {
+                          setActiveTab(tab.id);
+                        }
+                      }}
+                      disabled={isPendingTab}
+                      aria-disabled={isPendingTab}
+                      title={isPendingTab ? "Nội dung đang được chuẩn bị (sẽ cập nhật sau) - Chưa khả dụng" : undefined}
+                      className={`group flex items-center space-x-2 px-2.5 py-1.5 rounded-lg text-xs md:text-sm font-semibold whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] flex-shrink-0 border ${
+                        isPendingTab
+                          ? 'opacity-35 select-none cursor-not-allowed border-dashed border-slate-300 dark:border-slate-800 bg-slate-100/40 dark:bg-slate-900/30 text-slate-400 dark:text-slate-600 grayscale pointer-events-auto shadow-none'
+                          : isActive
                           ? darkMode
-                            ? 'bg-gradient-to-b from-orange-500/25 via-orange-500/15 to-orange-600/30 text-orange-400 border-t-orange-400/40 border-x-orange-500/20 border-b-orange-600/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_4px_12px_rgba(249,115,22,0.25)] font-bold backdrop-blur-md'
-                            : 'bg-gradient-to-b from-orange-500/15 via-orange-500/5 to-orange-500/10 text-orange-600 border-t-orange-400/40 border-x-orange-400/20 border-b-orange-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_4px_12px_rgba(249,115,22,0.12)] font-bold backdrop-blur-md'
+                            ? 'bg-gradient-to-b from-orange-500/25 via-orange-500/15 to-orange-600/30 text-orange-400 border-t-orange-400/40 border-x-orange-500/20 border-b-orange-600/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_4px_12px_rgba(249,115,22,0.25)] font-bold backdrop-blur-md hover:scale-102 active:scale-95 cursor-pointer'
+                            : 'bg-gradient-to-b from-orange-500/15 via-orange-500/5 to-orange-500/10 text-orange-600 border-t-orange-400/40 border-x-orange-400/20 border-b-orange-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_4px_12px_rgba(249,115,22,0.12)] font-bold backdrop-blur-md hover:scale-102 active:scale-95 cursor-pointer'
                           : darkMode
-                            ? 'text-slate-400 border-t-white/10 border-x-white/5 border-b-black/30 bg-gradient-to-b from-slate-850/60 via-slate-900/40 to-slate-950/50 hover:text-slate-100 hover:from-slate-800/80 hover:to-slate-900/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.25)]'
-                            : 'text-slate-600 border-t-white border-x-white/80 border-b-slate-200/40 bg-gradient-to-b from-white/95 via-white/85 to-slate-100/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_2px_4px_rgba(0,0,0,0.02)] hover:text-blue-600 hover:from-sky-50 hover:to-blue-100/70 hover:shadow-md hover:border-b-blue-300 hover:shadow-blue-100/30'
+                            ? 'text-slate-400 border-t-white/10 border-x-white/5 border-b-black/30 bg-gradient-to-b from-slate-850/60 via-slate-900/40 to-slate-950/50 hover:text-slate-100 hover:from-slate-800/80 hover:to-slate-900/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.25)] hover:scale-102 active:scale-95 cursor-pointer'
+                            : 'text-slate-600 border-t-white border-x-white/80 border-b-slate-200/40 bg-gradient-to-b from-white/95 via-white/85 to-slate-100/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_2px_4px_rgba(0,0,0,0.02)] hover:text-blue-600 hover:from-sky-50 hover:to-blue-100/70 hover:shadow-md hover:border-b-blue-300 hover:shadow-blue-100/30 hover:scale-102 active:scale-95 cursor-pointer'
                       }`}
                     >
                       <span className={`transition-colors duration-300 ${
-                        isActive 
+                        isPendingTab
+                          ? 'text-slate-400 dark:text-slate-600'
+                          : isActive 
                           ? darkMode ? 'text-orange-400' : 'text-orange-600' 
                           : darkMode 
                             ? 'text-slate-500 group-hover:text-slate-100' 
@@ -819,14 +901,20 @@ export default function App() {
                         {getTabIcon(tab.icon)}
                       </span>
                       <span>{tab.label}</span>
-                      {query && tabMatches > 0 && (
-                        <span className={`ml-1.5 px-1.5 py-0.5 text-[10px] font-extrabold rounded-full transition-all duration-200 ${
-                          isActive 
-                            ? 'bg-white text-orange-600 font-bold' 
-                            : 'bg-orange-500 text-white'
-                        }`}>
-                          {tabMatches}
+                      {isPendingTab ? (
+                        <span className="text-[10px] font-medium tracking-tight px-1.5 py-0.5 rounded bg-slate-200/70 dark:bg-slate-800 text-slate-500 dark:text-slate-400 ml-1">
+                          TBA
                         </span>
+                      ) : (
+                        query && tabMatches > 0 && (
+                          <span className={`ml-1.5 px-1.5 py-0.5 text-[10px] font-extrabold rounded-full transition-all duration-200 ${
+                            isActive 
+                              ? 'bg-white text-orange-600 font-bold' 
+                              : 'bg-orange-500 text-white'
+                          }`}>
+                            {tabMatches}
+                          </span>
+                        )
                       )}
                     </button>
                   );
@@ -852,26 +940,36 @@ export default function App() {
                   {PORTAL_TABS.map((tab) => {
                     const isActive = activeTab === tab.id;
                     const tabMatches = getTabMatchesCount(tab.id);
+                    const isPendingTab = tab.id === 'internship-thesis' || tab.id === 'scholarship-exchange';
                     return (
                       <button
                         key={tab.id}
                         id={`mobile-nav-btn-${tab.id}`}
                         onClick={() => {
-                          setActiveTab(tab.id);
-                          setIsMobileMenuOpen(false);
+                          if (!isPendingTab) {
+                            setActiveTab(tab.id);
+                            setIsMobileMenuOpen(false);
+                          }
                         }}
-                        className={`group flex items-center space-x-3 px-4 py-3 rounded-xl text-sm md:text-base font-semibold transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.01] active:scale-95 cursor-pointer border w-full text-left ${
-                          isActive
-                            ? darkMode
-                              ? 'bg-gradient-to-b from-orange-500/25 via-orange-500/15 to-orange-600/30 text-orange-400 border-t-orange-400/40 border-x-orange-500/20 border-b-orange-600/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_4px_12px_rgba(249,115,22,0.25)] font-bold backdrop-blur-md'
-                              : 'bg-gradient-to-b from-orange-500/15 via-orange-500/5 to-orange-500/10 text-orange-600 border-t-orange-400/40 border-x-orange-400/20 border-b-orange-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_4px_12px_rgba(249,115,22,0.12)] font-bold backdrop-blur-md'
-                            : darkMode
-                              ? 'text-slate-400 border-t-white/10 border-x-white/5 border-b-black/30 bg-gradient-to-b from-slate-850/60 via-slate-900/40 to-slate-950/50 hover:text-slate-100 hover:from-slate-800/80 hover:to-slate-900/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.25)]'
-                              : 'text-slate-600 border-t-white border-x-white/80 border-b-slate-200/40 bg-gradient-to-b from-white/95 via-white/85 to-slate-100/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_2px_4px_rgba(0,0,0,0.02)] hover:text-blue-600 hover:from-sky-50 hover:to-blue-100/70 hover:shadow-md hover:border-b-blue-300 hover:shadow-blue-100/30'
+                        disabled={isPendingTab}
+                        aria-disabled={isPendingTab}
+                        title={isPendingTab ? "Nội dung đang được chuẩn bị (sẽ cập nhật sau) - Chưa khả dụng" : undefined}
+                        className={`group flex items-center space-x-3 px-4 py-3 rounded-xl text-sm md:text-base font-semibold transition-all duration-300 w-full text-left border ${
+                          isPendingTab
+                            ? 'opacity-35 select-none cursor-not-allowed border-dashed border-slate-300 dark:border-slate-800 bg-slate-100/40 dark:bg-slate-900/30 text-slate-400 dark:text-slate-600 grayscale pointer-events-auto'
+                            : isActive
+                              ? darkMode
+                                ? 'bg-gradient-to-b from-orange-500/25 via-orange-500/15 to-orange-600/30 text-orange-400 border-t-orange-400/40 border-x-orange-500/20 border-b-orange-600/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_4px_12px_rgba(249,115,22,0.25)] font-bold backdrop-blur-md hover:scale-[1.01] active:scale-95 cursor-pointer'
+                                : 'bg-gradient-to-b from-orange-500/15 via-orange-500/5 to-orange-500/10 text-orange-600 border-t-orange-400/40 border-x-orange-400/20 border-b-orange-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_4px_12px_rgba(249,115,22,0.12)] font-bold backdrop-blur-md hover:scale-[1.01] active:scale-95 cursor-pointer'
+                              : darkMode
+                                ? 'text-slate-400 border-t-white/10 border-x-white/5 border-b-black/30 bg-gradient-to-b from-slate-850/60 via-slate-900/40 to-slate-950/50 hover:text-slate-100 hover:from-slate-800/80 hover:to-slate-900/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.25)] hover:scale-[1.01] active:scale-95 cursor-pointer'
+                                : 'text-slate-600 border-t-white border-x-white/80 border-b-slate-200/40 bg-gradient-to-b from-white/95 via-white/85 to-slate-100/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_2px_4px_rgba(0,0,0,0.02)] hover:text-blue-600 hover:from-sky-50 hover:to-blue-100/70 hover:shadow-md hover:border-b-blue-300 hover:shadow-blue-100/30 hover:scale-[1.01] active:scale-95 cursor-pointer'
                         }`}
                       >
                         <span className={`transition-colors duration-300 ${
-                          isActive 
+                          isPendingTab
+                            ? 'text-slate-400 dark:text-slate-600'
+                            : isActive 
                             ? darkMode ? 'text-orange-400' : 'text-orange-600' 
                             : darkMode 
                               ? 'text-slate-500 group-hover:text-slate-100' 
@@ -880,14 +978,20 @@ export default function App() {
                           {getTabIcon(tab.icon)}
                         </span>
                         <span className="flex-1">{tab.label}</span>
-                        {query && tabMatches > 0 && (
-                          <span className={`px-1.5 py-0.5 text-[10px] font-extrabold rounded-full transition-all duration-200 ${
-                            isActive 
-                              ? 'bg-white text-orange-600 font-bold' 
-                              : 'bg-orange-500 text-white'
-                          }`}>
-                            {tabMatches}
+                        {isPendingTab ? (
+                          <span className="text-[10px] font-medium tracking-tight px-1.5 py-0.5 rounded bg-slate-200/70 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                            TBA
                           </span>
+                        ) : (
+                          query && tabMatches > 0 && (
+                            <span className={`px-1.5 py-0.5 text-[10px] font-extrabold rounded-full transition-all duration-200 ${
+                              isActive 
+                                ? 'bg-white text-orange-600 font-bold' 
+                                : 'bg-orange-500 text-white'
+                            }`}>
+                              {tabMatches}
+                            </span>
+                          )
                         )}
                       </button>
                     );
@@ -1435,17 +1539,27 @@ export default function App() {
                   )}
 
                   {/* Part B: Exams & Registrations */}
-                  {(examPrereqMatches || filteredExamCards.length > 0) && (
-                    <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-850">
-                      <div className="flex items-center space-x-2">
-                        <FileText className="w-5 h-5 text-orange-500" />
-                        <h2 className={`text-base font-extrabold tracking-tight ${
-                          darkMode ? 'text-slate-200' : 'text-slate-800'
-                        }`}>
-                          Examinations & Registration Portals
-                        </h2>
+                  {(examPrereqMatches || examRulesMatches || filteredExamCards.length > 0) && (
+                    <div className="space-y-6 pt-4 border-t border-slate-200 dark:border-slate-850" id="section-exams-registrations">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                        <div className="flex items-center space-x-2">
+                          <FileText className="w-5 h-5 text-orange-500" />
+                          <h2 className={`text-base font-extrabold tracking-tight ${
+                            darkMode ? 'text-slate-200' : 'text-slate-800'
+                          }`}>
+                            Examinations & Registration Portals
+                          </h2>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className={`text-[11px] font-mono font-medium px-2.5 py-0.5 rounded-full border ${
+                            darkMode ? 'bg-slate-800/80 border-slate-700 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-600'
+                          }`}>
+                            Academic Year 2026 - 2027
+                          </span>
+                        </div>
                       </div>
 
+                      {/* General Prerequisites Warning Box */}
                       {examPrereqMatches && (
                         <div className={`p-6 rounded-xl border ${
                           darkMode ? 'bg-amber-500/5 border-amber-500/15 text-slate-300' : 'bg-amber-50/50 border-amber-200 text-slate-700'
@@ -1464,6 +1578,364 @@ export default function App() {
                                 <li>Laboratory attendance is strictly mandatory at 100%—all practical blocks must be fully passed.</li>
                                 <li>Satisfactory grades must be obtained on all homework, midterms, or project reports.</li>
                               </ul>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Detailed Guidelines: A. Retake Exam Registration & B. Step-Back from a Final Exam */}
+                      {examRulesMatches && (
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5" id="exam-guidelines-row">
+                          {/* Card A: RETAKE EXAM REGISTRATION */}
+                          <div 
+                            id="card-retake-exam-registration"
+                            className={`rounded-2xl border transition-all duration-200 overflow-hidden flex flex-col justify-between ${
+                              darkMode 
+                                ? 'bg-slate-900/60 border-slate-800 backdrop-blur-sm shadow-sm' 
+                                : 'bg-white border-slate-200/90 shadow-xs'
+                            }`}
+                          >
+                            <div>
+                              {/* Header & Toggle Bar */}
+                              <div className={`p-4 sm:p-5 flex items-center justify-between border-b ${
+                                darkMode ? 'border-slate-800 bg-slate-900/40' : 'border-slate-100 bg-slate-50/60'
+                              }`}>
+                                <div className="flex items-center gap-3">
+                                  <div className="w-9 h-9 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center flex-shrink-0">
+                                    <FileText className="w-4 h-4" />
+                                  </div>
+                                  <div>
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-[10px] font-bold uppercase tracking-wider text-orange-600 dark:text-orange-400">
+                                        Section A
+                                      </span>
+                                      <span className="text-slate-300 dark:text-slate-700">•</span>
+                                      <span className={`text-[11px] font-medium ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                                        Retake Regulations
+                                      </span>
+                                    </div>
+                                    <h3 className={`text-sm sm:text-base font-bold tracking-tight ${
+                                      darkMode ? 'text-white' : 'text-slate-900'
+                                    }`}>
+                                      Retake Exam Registration
+                                    </h3>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <a
+                                    href="https://forms.gle/CkecUGbfnLmz5E5u6"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    id="retake-register-link-btn"
+                                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-orange-500 hover:bg-orange-600 text-white transition-colors shadow-xs"
+                                  >
+                                    <span>Register Retake</span>
+                                    <ArrowUpRight className="w-3.5 h-3.5" />
+                                  </a>
+                                  <button
+                                    type="button"
+                                    onClick={() => setIsRetakeRulesExpanded(prev => !prev)}
+                                    className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                                      darkMode ? 'hover:bg-slate-800 text-slate-400 hover:text-white' : 'hover:bg-slate-100 text-slate-500 hover:text-slate-900'
+                                    }`}
+                                    aria-label="Toggle Retake Exam Rules"
+                                  >
+                                    <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${
+                                      (isRetakeRulesExpanded || query.trim().length > 0) ? 'rotate-180' : ''
+                                    }`} />
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* Card Body */}
+                              {(isRetakeRulesExpanded || query.trim().length > 0) && (
+                                <div className="p-5 space-y-4">
+                                  {/* Deadline Notice */}
+                                  <div className={`p-3.5 rounded-xl border flex items-start gap-3 ${
+                                    darkMode ? 'bg-amber-500/5 border-amber-500/20 text-slate-300' : 'bg-amber-50/60 border-amber-200/80 text-slate-700'
+                                  }`}>
+                                    <div className="p-1 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5">
+                                      <Clock className="w-4 h-4" />
+                                    </div>
+                                    <div className="text-xs leading-relaxed">
+                                      <div className={`font-semibold mb-0.5 ${darkMode ? 'text-amber-300' : 'text-amber-900'}`}>
+                                        Registration Deadline: 7 Days Prior to Exam Date
+                                      </div>
+                                      <p className={darkMode ? 'text-slate-300' : 'text-slate-600'}>
+                                        All retake registrations must be submitted at least <strong>7 calendar days before the exam date</strong>. Late requests are strictly rejected. Check the official schedule in the{' '}
+                                        <a 
+                                          href="https://docs.google.com/spreadsheets/d/1Dj9MiKupgDBFr8GGaJIKbt6GlPgVcQELVLam8EGl0cM/edit?gid=218939538#gid=218939538" 
+                                          target="_blank" 
+                                          rel="noopener noreferrer"
+                                          className="font-medium text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-0.5"
+                                        >
+                                          <span>MEC Teaching Plan AY 2026-2027</span>
+                                          <ArrowUpRight className="w-3 h-3" />
+                                        </a>.
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  {/* Eligibility Section (Who Can vs Who Cannot) */}
+                                  <div className="space-y-2.5">
+                                    <div className={`text-[11px] font-bold uppercase tracking-wider ${
+                                      darkMode ? 'text-slate-400' : 'text-slate-500'
+                                    }`}>
+                                      Registration Eligibility Criteria
+                                    </div>
+
+                                    <div className="grid grid-cols-1 gap-2.5">
+                                      {/* Permitted */}
+                                      <div className={`p-3.5 rounded-xl border flex items-start gap-3 ${
+                                        darkMode ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-emerald-50/50 border-emerald-200/80'
+                                      }`}>
+                                        <div className="p-1 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5">
+                                          <CheckCircle2 className="w-4 h-4" />
+                                        </div>
+                                        <div className="text-xs leading-relaxed">
+                                          <span className={`font-semibold inline-block mr-1.5 ${
+                                            darkMode ? 'text-emerald-300' : 'text-emerald-900'
+                                          }`}>
+                                            Eligible:
+                                          </span>
+                                          <span className={darkMode ? 'text-slate-300' : 'text-slate-700'}>
+                                            Students who previously <strong>failed</strong> or officially <strong>stepped back</strong> from the exam in a prior semester.
+                                          </span>
+                                        </div>
+                                      </div>
+
+                                      {/* Ineligible */}
+                                      <div className={`p-3.5 rounded-xl border flex items-start gap-3 ${
+                                        darkMode ? 'bg-rose-500/5 border-rose-500/20' : 'bg-rose-50/50 border-rose-200/80'
+                                      }`}>
+                                        <div className="p-1 rounded-md bg-rose-500/10 text-rose-600 dark:text-rose-400 flex-shrink-0 mt-0.5">
+                                          <XCircle className="w-4 h-4" />
+                                        </div>
+                                        <div className="text-xs leading-relaxed">
+                                          <span className={`font-semibold inline-block mr-1.5 ${
+                                            darkMode ? 'text-rose-300' : 'text-rose-900'
+                                          }`}>
+                                            Not Eligible:
+                                          </span>
+                                          <span className={darkMode ? 'text-slate-300' : 'text-slate-700'}>
+                                            Students <strong>banned due to insufficient attendance</strong> cannot retake the exam directly. They must <strong>re-enroll and retake the entire course</strong> in a subsequent semester.
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  {/* Compulsory Attendance Notice */}
+                                  <div className={`p-3.5 rounded-xl border flex items-start gap-3 ${
+                                    darkMode ? 'bg-slate-800/40 border-slate-700/80' : 'bg-slate-50 border-slate-200'
+                                  }`}>
+                                    <div className="p-1 rounded-md bg-orange-500/10 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5">
+                                      <AlertTriangle className="w-4 h-4" />
+                                    </div>
+                                    <div className="text-xs leading-relaxed">
+                                      <span className={`font-semibold block mb-0.5 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
+                                        Compulsory Attendance on Finalized Exam List
+                                      </span>
+                                      <span className={darkMode ? 'text-slate-400' : 'text-slate-600'}>
+                                        Once the official exam roster is finalized, examination attendance is mandatory. Unexcused absence will result in a <strong className="text-rose-600 dark:text-rose-400 font-semibold">Failed Grade (5.0)</strong> and counts as an examination attempt.
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Mobile action button */}
+                            <div className="p-3 sm:hidden border-t border-slate-100 dark:border-slate-800/60">
+                              <a
+                                href="https://forms.gle/CkecUGbfnLmz5E5u6"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-orange-500 text-white"
+                              >
+                                <span>Register Retake Exam</span>
+                                <ArrowUpRight className="w-3.5 h-3.5" />
+                              </a>
+                            </div>
+                          </div>
+
+                          {/* Card B: STEP-BACK FROM A FINAL EXAM */}
+                          <div 
+                            id="card-stepback-final-exam"
+                            className={`rounded-2xl border transition-all duration-200 overflow-hidden flex flex-col justify-between ${
+                              darkMode 
+                                ? 'bg-slate-900/60 border-slate-800 backdrop-blur-sm shadow-sm' 
+                                : 'bg-white border-slate-200/90 shadow-xs'
+                            }`}
+                          >
+                            <div>
+                              {/* Header & Toggle Bar */}
+                              <div className={`p-4 sm:p-5 flex items-center justify-between border-b ${
+                                darkMode ? 'border-slate-800 bg-slate-900/40' : 'border-slate-100 bg-slate-50/60'
+                              }`}>
+                                <div className="flex items-center gap-3">
+                                  <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center flex-shrink-0">
+                                    <ShieldAlert className="w-4 h-4" />
+                                  </div>
+                                  <div>
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                                        Section B
+                                      </span>
+                                      <span className="text-slate-300 dark:text-slate-700">•</span>
+                                      <span className={`text-[11px] font-medium ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                                        Exam Withdrawal
+                                      </span>
+                                    </div>
+                                    <h3 className={`text-sm sm:text-base font-bold tracking-tight ${
+                                      darkMode ? 'text-white' : 'text-slate-900'
+                                    }`}>
+                                      Step-Back from a Final Exam
+                                    </h3>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <a
+                                    href="https://forms.gle/CkecUGbfnLmz5E5u6"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    id="stepback-register-link-btn"
+                                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-xs"
+                                  >
+                                    <span>Submit Step-Back</span>
+                                    <ArrowUpRight className="w-3.5 h-3.5" />
+                                  </a>
+                                  <button
+                                    type="button"
+                                    onClick={() => setIsStepBackRulesExpanded(prev => !prev)}
+                                    className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                                      darkMode ? 'hover:bg-slate-800 text-slate-400 hover:text-white' : 'hover:bg-slate-100 text-slate-500 hover:text-slate-900'
+                                    }`}
+                                    aria-label="Toggle Step-Back Rules"
+                                  >
+                                    <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${
+                                      (isStepBackRulesExpanded || query.trim().length > 0) ? 'rotate-180' : ''
+                                    }`} />
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* Card Body */}
+                              {(isStepBackRulesExpanded || query.trim().length > 0) && (
+                                <div className="p-5 space-y-4">
+                                  {/* Status & Options Overview */}
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                    <div className={`p-3.5 rounded-xl border ${
+                                      darkMode ? 'bg-slate-800/30 border-slate-700/60' : 'bg-slate-50/80 border-slate-200/80'
+                                    }`}>
+                                      <div className={`text-[11px] font-bold uppercase tracking-wider mb-1 ${
+                                        darkMode ? 'text-slate-400' : 'text-slate-500'
+                                      }`}>
+                                        Automatic Inclusion
+                                      </div>
+                                      <p className={`text-xs leading-relaxed ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                                        All enrolled students are placed on the <strong>Tentative Final Exam List</strong> by default.
+                                      </p>
+                                    </div>
+
+                                    <div className={`p-3.5 rounded-xl border ${
+                                      darkMode ? 'bg-slate-800/30 border-slate-700/60' : 'bg-slate-50/80 border-slate-200/80'
+                                    }`}>
+                                      <div className={`text-[11px] font-bold uppercase tracking-wider mb-1 ${
+                                        darkMode ? 'text-slate-400' : 'text-slate-500'
+                                      }`}>
+                                        Taking the Exam
+                                      </div>
+                                      <p className={`text-xs leading-relaxed ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                                        If you plan to sit for the final examination, <strong>no action is required</strong>.
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  {/* Withdrawal Instructions */}
+                                  <div className={`p-3.5 rounded-xl border flex items-start gap-3 ${
+                                    darkMode ? 'bg-blue-500/5 border-blue-500/20' : 'bg-blue-50/50 border-blue-200/80'
+                                  }`}>
+                                    <div className="p-1 rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5">
+                                      <Info className="w-4 h-4" />
+                                    </div>
+                                    <div className="text-xs leading-relaxed">
+                                      <span className={`font-semibold block mb-0.5 ${darkMode ? 'text-blue-300' : 'text-blue-900'}`}>
+                                        How to Step Back from a Module Exam
+                                      </span>
+                                      <span className={darkMode ? 'text-slate-300' : 'text-slate-600'}>
+                                        If you choose not to take the exam, you must submit{' '}
+                                        <a 
+                                          href="https://forms.gle/CkecUGbfnLmz5E5u6" 
+                                          target="_blank" 
+                                          rel="noopener noreferrer"
+                                          className="font-semibold text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-0.5"
+                                        >
+                                          <span>this official form</span>
+                                          <ArrowUpRight className="w-3 h-3" />
+                                        </a>{' '}
+                                        and select <em>“Stepping back from the final exam”</em> for each specific module.
+                                      </span>
+                                    </div>
+                                  </div>
+
+                                  {/* Deadline Notice */}
+                                  <div className={`p-3.5 rounded-xl border flex items-start gap-3 ${
+                                    darkMode ? 'bg-amber-500/5 border-amber-500/20 text-slate-300' : 'bg-amber-50/60 border-amber-200/80 text-slate-700'
+                                  }`}>
+                                    <div className="p-1 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5">
+                                      <Clock className="w-4 h-4" />
+                                    </div>
+                                    <div className="text-xs leading-relaxed">
+                                      <div className={`font-semibold mb-0.5 ${darkMode ? 'text-amber-300' : 'text-amber-900'}`}>
+                                        Submission Deadline: 7 Days Prior to Exam Date
+                                      </div>
+                                      <p className={darkMode ? 'text-slate-300' : 'text-slate-600'}>
+                                        Withdrawal requests must be completed <strong>no later than 7 calendar days before the exam date</strong>. Consult exam dates in the{' '}
+                                        <a 
+                                          href="https://docs.google.com/spreadsheets/d/1Dj9MiKupgDBFr8GGaJIKbt6GlPgVcQELVLam8EGl0cM/edit?gid=218939538#gid=218939538" 
+                                          target="_blank" 
+                                          rel="noopener noreferrer"
+                                          className="font-medium text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-0.5"
+                                        >
+                                          <span>MEC Teaching Plan AY 2026-2027</span>
+                                          <ArrowUpRight className="w-3 h-3" />
+                                        </a>.
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  {/* Compulsory Attendance Notice */}
+                                  <div className={`p-3.5 rounded-xl border flex items-start gap-3 ${
+                                    darkMode ? 'bg-slate-800/40 border-slate-700/80' : 'bg-slate-50 border-slate-200'
+                                  }`}>
+                                    <div className="p-1 rounded-md bg-orange-500/10 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5">
+                                      <AlertTriangle className="w-4 h-4" />
+                                    </div>
+                                    <div className="text-xs leading-relaxed">
+                                      <span className={`font-semibold block mb-0.5 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
+                                        Compulsory Attendance on Finalized Exam List
+                                      </span>
+                                      <span className={darkMode ? 'text-slate-400' : 'text-slate-600'}>
+                                        Once the exam list is finalized, attendance is mandatory. Failure to attend without approved circumstances results in a <strong className="text-rose-600 dark:text-rose-400 font-semibold">Failed Grade (5.0)</strong> and counts as one examination attempt.
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Mobile action button */}
+                            <div className="p-3 sm:hidden border-t border-slate-100 dark:border-slate-800/60">
+                              <a
+                                href="https://forms.gle/CkecUGbfnLmz5E5u6"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-blue-600 text-white"
+                              >
+                                <span>Submit Step-Back Form</span>
+                                <ArrowUpRight className="w-3.5 h-3.5" />
+                              </a>
                             </div>
                           </div>
                         </div>
@@ -2006,7 +2478,7 @@ export default function App() {
                   )}
 
                   {/* Part B: Regulations */}
-                  {(foundationTransitionMatches || filteredRegulationCards.length > 0) && (
+                  {(foundationTransitionMatches || retakeRegulationsMatches || filteredRegulationCards.length > 0) && (
                     <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-850">
                       <div className="flex items-center space-x-2">
                         <ShieldAlert className="w-5 h-5 text-orange-500" />
@@ -2103,6 +2575,289 @@ export default function App() {
                         </div>
                       )}
 
+                      {/* Examination Retakes & Oral Supplementary Assessment Regulations */}
+                      {retakeRegulationsMatches && (
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" id="section-regulations-retake-oral-wrapper">
+                          {/* 1. Retake Exam Regulations (Wiederholungsprüfungen) */}
+                          <div 
+                            id="section-retake-exams-regulations"
+                            className={`p-6 rounded-2xl border transition-all duration-300 relative overflow-hidden flex flex-col justify-between ${
+                              darkMode 
+                                ? 'bg-slate-900/40 border-slate-800 backdrop-blur-xl' 
+                                : 'bg-white border-slate-200 shadow-sm'
+                            }`}
+                          >
+                            <div className="absolute top-0 left-0 w-1.5 h-full bg-rose-500" />
+                            <div className="pl-2">
+                              <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                                <div className="flex items-center space-x-2">
+                                  <div className={`p-1.5 rounded-lg ${darkMode ? 'bg-rose-500/15 text-rose-400' : 'bg-rose-50 text-rose-600'}`}>
+                                    <RotateCcw className="w-4 h-4" />
+                                  </div>
+                                  <h3 className={`text-base font-extrabold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                                    Retake Exam Regulations
+                                  </h3>
+                                </div>
+                                <span className="px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase rounded bg-rose-500/10 text-rose-500 border border-rose-500/20">
+                                  Max 2 Retakes
+                                </span>
+                              </div>
+                              <p className={`text-xs leading-relaxed mb-4 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                                Mandatory examination progression policies governing all Mechatronics (MEC) students under the official regulatory framework:
+                              </p>
+
+                              <div className="space-y-3 text-xs">
+                                {/* Item 1: No Retakes for Passed Modules */}
+                                <div className={`p-3.5 rounded-xl border transition-all ${
+                                  darkMode 
+                                    ? 'bg-slate-950/40 border-slate-900/80 hover:border-slate-800' 
+                                    : 'bg-slate-50/70 border-slate-200/70 hover:border-slate-300'
+                                }`}>
+                                  <div className="flex items-start space-x-2.5">
+                                    <div className="mt-0.5 flex-shrink-0 text-rose-500">
+                                      <Ban className="w-4 h-4" />
+                                    </div>
+                                    <div>
+                                      <h4 className={`font-bold mb-1 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
+                                        No Retakes for Passed Modules
+                                      </h4>
+                                      <p className={`leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                                        Once you have passed a module examination, you are <strong className="text-rose-500 font-semibold">not permitted to re-register or retake</strong> it to improve your grade <em>(with a limited exception specifically governing Bachelor Thesis re-submission)</em>.
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Item 2: Maximum Number of Retakes */}
+                                <div className={`p-3.5 rounded-xl border transition-all ${
+                                  darkMode 
+                                    ? 'bg-slate-950/40 border-slate-900/80 hover:border-slate-800' 
+                                    : 'bg-slate-50/70 border-slate-200/70 hover:border-slate-300'
+                                }`}>
+                                  <div className="flex items-start space-x-2.5">
+                                    <div className="mt-0.5 flex-shrink-0 text-amber-500">
+                                      <RotateCcw className="w-4 h-4" />
+                                    </div>
+                                    <div>
+                                      <h4 className={`font-bold mb-1 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
+                                        Maximum Number of Retakes
+                                      </h4>
+                                      <p className={`leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                                        For each examination or module component evaluated as failed on the first attempt, you are permitted <strong className="text-amber-500 font-semibold">a maximum of 2 retakes</strong> <em>(providing a total of <strong className="text-slate-900 dark:text-white font-semibold">up to 3 exam attempts</strong> per module)</em>.
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Item 3: Conclusively Unsuccessful */}
+                                <div className={`p-3.5 rounded-xl border transition-all ${
+                                  darkMode 
+                                    ? 'bg-rose-950/20 border-rose-900/40 hover:border-rose-900/60' 
+                                    : 'bg-rose-50/60 border-rose-200/80 hover:border-rose-300'
+                                }`}>
+                                  <div className="flex items-start space-x-2.5">
+                                    <div className="mt-0.5 flex-shrink-0 text-rose-600 dark:text-rose-400">
+                                      <AlertTriangle className="w-4 h-4" />
+                                    </div>
+                                    <div>
+                                      <div className="flex items-center space-x-2 mb-1">
+                                        <h4 className={`font-bold ${darkMode ? 'text-rose-300' : 'text-rose-900'}`}>
+                                          Conclusively Unsuccessful
+                                        </h4>
+                                      </div>
+                                      <p className={`leading-relaxed ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+                                        If you have exhausted both retake attempts and still fail, the module is designated as <strong className="text-rose-600 dark:text-rose-400 font-bold">&quot;conclusively unsuccessful&quot;</strong>. This legally deprives you of examination rights and results in <strong className="text-rose-600 dark:text-rose-400 underline font-bold">mandatory academic dismissal (exmatriculation)</strong> from the MEC program.
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Item 4: Cumulative Tracking of Failed Attempts */}
+                                <div className={`p-3.5 rounded-xl border transition-all ${
+                                  darkMode 
+                                    ? 'bg-slate-950/40 border-slate-900/80 hover:border-slate-800' 
+                                    : 'bg-slate-50/70 border-slate-200/70 hover:border-slate-300'
+                                }`}>
+                                  <div className="flex items-start space-x-2.5">
+                                    <div className="mt-0.5 flex-shrink-0 text-blue-500">
+                                      <History className="w-4 h-4" />
+                                    </div>
+                                    <div>
+                                      <h4 className={`font-bold mb-1 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
+                                        Cumulative Tracking of Failed Attempts
+                                      </h4>
+                                      <p className={`leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                                        When transferring universities or switching degree programs within HAW Hamburg, failed attempts from equivalent modules previously undertaken <strong className="text-blue-500 font-semibold">are cumulatively counted toward your maximum allowable attempts</strong>.
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* 2. Oral Supplementary Examination */}
+                          <div 
+                            id="section-oral-assessment-regulations"
+                            className={`p-6 rounded-2xl border transition-all duration-300 relative overflow-hidden flex flex-col justify-between ${
+                              darkMode 
+                                ? 'bg-slate-900/40 border-slate-800 backdrop-blur-xl' 
+                                : 'bg-white border-slate-200 shadow-sm'
+                            }`}
+                          >
+                            <div className="absolute top-0 left-0 w-1.5 h-full bg-sky-500" />
+                            <div className="pl-2">
+                              <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                                <div className="flex items-center space-x-2">
+                                  <div className={`p-1.5 rounded-lg ${darkMode ? 'bg-sky-500/15 text-sky-400' : 'bg-sky-50 text-sky-600'}`}>
+                                    <MessageSquare className="w-4 h-4" />
+                                  </div>
+                                  <h3 className={`text-base font-extrabold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                                    Oral Supplementary Examination
+                                  </h3>
+                                </div>
+                                <span className="px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase rounded bg-sky-500/10 text-sky-500 border border-sky-500/20">
+                                  Oral Assessment (5.0 &rarr; 4.0)
+                                </span>
+                              </div>
+                              <p className={`text-xs leading-relaxed mb-4 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                                Regulatory provisions governing oral supplementary exams to rescue an unsatisfactory exam result:
+                              </p>
+
+                              <div className="space-y-3 text-xs">
+                                {/* Point 1: Purpose & Grade Rescue */}
+                                <div className={`p-3.5 rounded-xl border transition-all ${
+                                  darkMode 
+                                    ? 'bg-slate-950/40 border-slate-900/80 hover:border-slate-800' 
+                                    : 'bg-slate-50/70 border-slate-200/70 hover:border-slate-300'
+                                }`}>
+                                  <div className="flex items-start space-x-2.5">
+                                    <div className="mt-0.5 flex-shrink-0 text-sky-500">
+                                      <Award className="w-4 h-4" />
+                                    </div>
+                                    <div>
+                                      <h4 className={`font-bold mb-1 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
+                                        Grade Rescue Objective (5.0 &rarr; 4.0)
+                                      </h4>
+                                      <p className={`leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                                        An academic rescue opportunity exclusively for examinations administered as a <strong className="text-slate-900 dark:text-white font-semibold">written exam</strong> or <strong className="text-slate-900 dark:text-white font-semibold">take-home paper</strong> evaluated as failed (grade 5.0). The oral assessment outcome determines solely whether the failing grade (5.0) remains unchanged or is <strong className="text-sky-500 font-semibold">raised to the minimum passing grade of 4.0 (Sufficient)</strong>.
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Point 2 & 3: Not Counted as Retake & Limits */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                  <div className={`p-3.5 rounded-xl border transition-all ${
+                                    darkMode 
+                                      ? 'bg-slate-950/40 border-slate-900/80 hover:border-slate-800' 
+                                      : 'bg-slate-50/70 border-slate-200/70 hover:border-slate-300'
+                                  }`}>
+                                    <div className="flex items-start space-x-2.5">
+                                      <div className="mt-0.5 flex-shrink-0 text-emerald-500">
+                                        <CheckCircle2 className="w-4 h-4" />
+                                      </div>
+                                      <div>
+                                        <h4 className={`font-bold mb-1 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
+                                          Not Counted as a Retake Attempt
+                                        </h4>
+                                        <p className={`leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                                          Legally treated as a component of the current exam attempt to rescue the grade; therefore, it <strong className="text-emerald-500 font-semibold">is not deducted from your resit quota</strong>.
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div className={`p-3.5 rounded-xl border transition-all ${
+                                    darkMode 
+                                      ? 'bg-slate-950/40 border-slate-900/80 hover:border-slate-800' 
+                                      : 'bg-slate-50/70 border-slate-200/70 hover:border-slate-300'
+                                  }`}>
+                                    <div className="flex items-start space-x-2.5">
+                                      <div className="mt-0.5 flex-shrink-0 text-amber-500">
+                                        <Clock className="w-4 h-4" />
+                                      </div>
+                                      <div>
+                                        <h4 className={`font-bold mb-1 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
+                                          Lifetime & Frequency Limits
+                                        </h4>
+                                        <p className={`leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                                          Permitted a maximum of <strong className="text-amber-500 font-semibold">1 time</strong> per module, and a cumulative total of <strong className="text-amber-500 font-semibold">no more than 3 times</strong> throughout the entire Bachelor degree program.
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Point 4 & 5: Application Deadline & Duration */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                  <div className={`p-3.5 rounded-xl border transition-all ${
+                                    darkMode 
+                                      ? 'bg-slate-950/40 border-slate-900/80 hover:border-slate-800' 
+                                      : 'bg-slate-50/70 border-slate-200/70 hover:border-slate-300'
+                                  }`}>
+                                    <div className="flex items-start space-x-2.5">
+                                      <div className="mt-0.5 flex-shrink-0 text-blue-500">
+                                        <Calendar className="w-4 h-4" />
+                                      </div>
+                                      <div>
+                                        <h4 className={`font-bold mb-1 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
+                                          Application Deadline
+                                        </h4>
+                                        <p className={`leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                                          A formal written petition must be submitted to the MEC program within <strong className="text-blue-500 font-semibold">4 weeks</strong> of official grade announcement <em>(official semester breaks are excluded from this window)</em>.
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div className={`p-3.5 rounded-xl border transition-all ${
+                                    darkMode 
+                                      ? 'bg-slate-950/40 border-slate-900/80 hover:border-slate-800' 
+                                      : 'bg-slate-50/70 border-slate-200/70 hover:border-slate-300'
+                                  }`}>
+                                    <div className="flex items-start space-x-2.5">
+                                      <div className="mt-0.5 flex-shrink-0 text-indigo-500">
+                                        <Clock className="w-4 h-4" />
+                                      </div>
+                                      <div>
+                                        <h4 className={`font-bold mb-1 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
+                                          Examination Duration
+                                        </h4>
+                                        <p className={`leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                                          Conducted as an oral examination lasting between <strong className="text-indigo-500 font-semibold">15 and 45 minutes</strong> directly before the academic examination panel.
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Point 6: Exclusion Criteria */}
+                                <div className={`p-3.5 rounded-xl border transition-all ${
+                                  darkMode 
+                                    ? 'bg-rose-950/15 border-rose-900/30' 
+                                    : 'bg-rose-50/40 border-rose-200/60'
+                                }`}>
+                                  <div className="flex items-start space-x-2.5">
+                                    <div className="mt-0.5 flex-shrink-0 text-rose-500">
+                                      <XCircle className="w-4 h-4" />
+                                    </div>
+                                    <div>
+                                      <h4 className={`font-bold mb-1 ${darkMode ? 'text-rose-300' : 'text-rose-800'}`}>
+                                        Exclusion Criteria
+                                      </h4>
+                                      <p className={`leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                                        You <strong className="text-rose-500 font-semibold">are strictly disqualified</strong> from applying for an oral supplementary exam if the 5.0 grade resulted from <strong className="text-rose-500">academic misconduct (cheating)</strong>, <strong className="text-rose-500">examination room disruption</strong>, or <strong className="text-rose-500">unexcused absence</strong>.
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
                       {filteredRegulationCards.length > 0 && (
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-5" id="regulation-cards-grid">
                           {filteredRegulationCards.map((card, idx) => (
@@ -2142,7 +2897,7 @@ export default function App() {
                       Student Administrative Forms
                     </h2>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5" id="form-cards-grid">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5" id="form-cards-grid">
                     {filteredFormCards.map((card, idx) => (
                       <PortalCardComponent key={idx} card={card} darkMode={darkMode} />
                     ))}
@@ -2150,8 +2905,8 @@ export default function App() {
                 </div>
               )}
 
-              {/* 5. INTERNSHIP & BACHELOR THESIS */}
-              {activeTab === 'internship-thesis' && (
+              {/* 5. INTERNSHIP & BACHELOR THESIS - Hidden per user request (will be updated later) */}
+              {false && activeTab === 'internship-thesis' && (
                 <div className="space-y-8" id="section-internship-thesis">
                   {/* Part B: Internship Requirements */}
                   {(internshipOverviewMatches || filteredInternshipCards.length > 0) && (
@@ -2322,8 +3077,8 @@ export default function App() {
                 </div>
               )}
 
-              {/* 6. SCHOLARSHIP & EXCHANGE */}
-              {activeTab === 'scholarship-exchange' && (
+              {/* 6. SCHOLARSHIP & EXCHANGE - Hidden per user request (will be updated later) */}
+              {false && activeTab === 'scholarship-exchange' && (
                 <div className="space-y-8" id="section-scholarship-exchange">
                   {/* Part A: Scholarships */}
                   {filteredScholarshipCards.length > 0 && (
