@@ -95,11 +95,11 @@ export default function GradeConversionTable({ darkMode, searchQuery = '' }: Gra
 
   // Split into left and right columns like the official paper format
   const leftColumnRows = useMemo(() => {
-    return filteredRows.filter(item => item.id <= 18);
+    return filteredRows.filter(item => item.id <= 6);
   }, [filteredRows]);
 
   const rightColumnRows = useMemo(() => {
-    return filteredRows.filter(item => item.id > 18);
+    return filteredRows.filter(item => item.id > 6);
   }, [filteredRows]);
 
   const resetConverter = () => {
@@ -176,7 +176,7 @@ export default function GradeConversionTable({ darkMode, searchQuery = '' }: Gra
               <div className="relative flex-1">
                 <input
                   type="text"
-                  placeholder="German grade (e.g. 1.3)"
+                  placeholder="German grade (e.g. 1.3, 2.0, 3.7)"
                   value={converterGermanInput}
                   onChange={(e) => {
                     setConverterGermanInput(e.target.value);
@@ -399,7 +399,7 @@ export default function GradeConversionTable({ darkMode, searchQuery = '' }: Gra
                 <span className={`text-[11px] font-mono font-bold uppercase tracking-wider ${
                   darkMode ? 'text-slate-400' : 'text-slate-500'
                 }`}>
-                  Part 2: Grades 2.8 – 5.0 (Satisfactory, Pass & Fail)
+                  Part 2: Grades 3.0 – 5.0 (Satisfactory, Pass & Fail)
                 </span>
                 <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-orange-500/10 text-orange-500">
                   {rightColumnRows.length} grade levels
@@ -482,7 +482,7 @@ export default function GradeConversionTable({ darkMode, searchQuery = '' }: Gra
                   <strong>Passing Grade (Pass):</strong> Students must achieve a grade of <strong>&le; 4.0 on the German scale</strong> (equivalent to <strong>&ge; 5.0 on the Vietnamese scale</strong>, and at least 50% academic achievement) to successfully complete a course.
                 </li>
                 <li>
-                  <strong>Failing Grade (Fail):</strong> A grade of <strong>5.0 (German)</strong> / <strong>4.0 (Vietnamese)</strong> corresponds to academic performance below 50%. Students are required to register for an official retake examination or course repetition according to Faculty regulations.
+                  <strong>Failing Grade (Fail):</strong> A grade of <strong>5.0 (German)</strong> corresponds to academic performance below 50% (&lt; 5.0 Vietnamese). Students are required to register for an official retake examination or course repetition according to Faculty regulations.
                 </li>
               </ul>
             </div>

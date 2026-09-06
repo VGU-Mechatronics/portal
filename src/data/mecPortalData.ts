@@ -92,6 +92,22 @@ export const ARCHIVED_SCHEDULES: ArchivedSchedule[] = [
   }
 ];
 
+export interface StudentListResource {
+  title: string;
+  subtitle: string;
+  cohort: string;
+  url: string;
+  type: 'LINK' | 'EXCEL' | 'DRIVE';
+}
+
+export const STUDENT_LIST_RESOURCE: StudentListResource = {
+  title: "Student List",
+  subtitle: "Official student intake rosters, class registrations & group allocations",
+  cohort: "Official Roster",
+  url: "https://docs.google.com/spreadsheets/d/178P07YRBWgoGiOgCbltsb-ELi536tn_s3vSif-_uZsk/edit?usp=sharing",
+  type: "LINK"
+};
+
 export const CURRICULUM_CARDS: PortalCard[] = [
   {
     title: "HAW Hamburg Module Handbook",

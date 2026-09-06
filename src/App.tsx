@@ -56,6 +56,7 @@ import {
   SCHEDULE_CARDS,
   ARCHIVED_SCHEDULES,
   ArchivedSchedule,
+  STUDENT_LIST_RESOURCE,
   CURRICULUM_CARDS,
   REGULATION_CARDS,
   FORM_CARDS,
@@ -77,6 +78,13 @@ export interface SearchItem {
 }
 
 const SEARCH_POOL: SearchItem[] = [
+  {
+    title: 'Student List - Official Cohort Rosters & Enrolled Class Members',
+    description: 'Official student intake rosters, class registrations and cohort group allocations for the MEC program',
+    type: 'LINK' as const,
+    category: 'Schedules & Exams',
+    url: STUDENT_LIST_RESOURCE.url
+  },
   {
     title: 'Article 19. Evaluation of Examinations - German & Vietnamese Grade Conversion Scale',
     description: 'Official linear calibration between German grading scale (1.0 - 5.0) and Vietnamese 10-point scale based on academic achievement %',
@@ -360,6 +368,11 @@ export default function App() {
         s.academicYear.toLowerCase().includes(query)
       )
     : ARCHIVED_SCHEDULES;
+
+  const isStudentListVisible = !query ||
+    STUDENT_LIST_RESOURCE.title.toLowerCase().includes(query) ||
+    STUDENT_LIST_RESOURCE.subtitle.toLowerCase().includes(query) ||
+    "student sinh vien sinh viên danh sach danh sách cohort list roster".includes(query);
 
   const filteredExamCards = query 
     ? EXAM_CARDS.filter(c => c.title.toLowerCase().includes(query) || (c.description && c.description.toLowerCase().includes(query)))
@@ -1217,7 +1230,7 @@ export default function App() {
               {activeTab === 'schedules-exams' && (
                 <div className="space-y-8" id="section-schedules-exams">
                   {/* Part A: Academic Schedules */}
-                  {(filteredScheduleCards.length > 0 || filteredArchivedSchedules.length > 0) && (
+                  {(filteredScheduleCards.length > 0 || filteredArchivedSchedules.length > 0 || isStudentListVisible) && (
                     <div className="space-y-6" id="section-academic-schedules">
                       {/* Section Title Header */}
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -1257,111 +1270,163 @@ export default function App() {
                         </div>
                       )}
 
-                      {/* 2. Previous Semesters Archive (Collapsible) */}
-                      {filteredArchivedSchedules.length > 0 && (
-                        <div className={`rounded-2xl border transition-all duration-300 overflow-hidden ${
-                          darkMode 
-                            ? 'bg-slate-900/40 border-slate-800/80 backdrop-blur-md' 
-                            : 'bg-white/80 border-slate-200 shadow-sm'
-                        }`} id="previous-schedules-archive">
-                          {/* Interactive Header / Toggle Bar */}
-                          <button
-                            type="button"
-                            onClick={() => setIsArchiveExpanded(prev => !prev)}
-                            className={`w-full p-4 sm:p-5 text-left flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 transition-colors cursor-pointer ${
-                              darkMode ? 'hover:bg-white/[0.02]' : 'hover:bg-slate-50/70'
-                            }`}
-                            id="toggle-archive-schedules-btn"
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className="p-2 rounded-xl bg-orange-500/10 text-orange-500 flex-shrink-0">
-                                <History className="w-4 h-4" />
-                              </div>
-                              <div>
-                                <div className="flex items-center gap-2">
-                                  <h3 className={`font-bold text-sm tracking-tight ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
-                                    Previous Semesters Archive
-                                  </h3>
-                                  <span className={`px-2 py-0.5 text-[10px] font-mono font-bold uppercase rounded border ${
-                                    darkMode 
-                                      ? 'bg-slate-800 border-slate-700 text-slate-300' 
-                                      : 'bg-slate-100 border-slate-200 text-slate-600'
-                                  }`}>
-                                    {filteredArchivedSchedules.length}
-                                  </span>
-                                </div>
-                                <p className={`text-[11px] mt-0.5 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                                  {isArchiveExpanded || query.trim().length > 0 
-                                    ? 'Click to collapse previous academic term timetables' 
-                                    : 'Click to view historical timetables, module allocations & past records'}
-                                </p>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center gap-2 self-end sm:self-center">
-                              <span className={`text-[11px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg border transition-all ${
-                                (isArchiveExpanded || query.trim().length > 0)
-                                  ? (darkMode ? 'bg-orange-500/10 border-orange-500/30 text-orange-400' : 'bg-orange-50 border-orange-200 text-orange-600')
-                                  : (darkMode ? 'bg-slate-800/80 border-slate-700 text-slate-300 hover:text-white' : 'bg-slate-100 border-slate-200 text-slate-600 hover:text-slate-900')
-                              }`}>
-                                {(isArchiveExpanded || query.trim().length > 0) ? 'Collapse Archive' : 'Open Archive'}
-                              </span>
-                              <div className={`p-1 rounded-lg transition-transform duration-300 ${
-                                (isArchiveExpanded || query.trim().length > 0) ? 'rotate-180 text-orange-500' : 'text-slate-400'
-                              }`}>
-                                <ChevronDown className="w-4 h-4" />
-                              </div>
-                            </div>
-                          </button>
-
-                          {/* Collapsible Content Body */}
-                          {(isArchiveExpanded || query.trim().length > 0) && (
-                            <div className="px-4 pb-4 sm:px-5 sm:pb-5 pt-1 border-t border-slate-200/60 dark:border-slate-800/50 animate-fadeIn" id="archive-schedules-body">
-                              <div className={`grid gap-3.5 pt-3 ${
-                                filteredArchivedSchedules.length === 1 
-                                  ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3' 
-                                  : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'
-                              }`} id="archived-schedules-grid">
-                                {filteredArchivedSchedules.map((item) => (
-                                  <a
-                                    key={item.id}
-                                    href={item.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    id={`archive-schedule-${item.id}`}
-                                    className={`group p-3.5 rounded-xl border transition-all duration-200 flex flex-col justify-between ${
-                                      darkMode
-                                        ? 'bg-slate-950/40 border-slate-800/80 hover:bg-white/5 hover:border-orange-500/30 hover:shadow-md'
-                                        : 'bg-slate-50/80 border-slate-200 hover:bg-sky-50/60 hover:border-orange-500/30 hover:shadow-sm'
-                                    }`}
-                                  >
-                                    <div>
-                                      <div className="flex items-center justify-between mb-2">
-                                        <span className="font-mono text-xs font-extrabold px-2 py-0.5 rounded bg-orange-500/10 text-orange-500 border border-orange-500/20">
-                                          {item.semester}
-                                        </span>
-                                        <span className={`text-[9.5px] font-mono font-medium ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                                          {item.academicYear}
-                                        </span>
-                                      </div>
-                                      <h4 className={`text-xs font-bold transition-colors group-hover:text-orange-500 ${
+                      {/* 2. Auxiliary Row: Student List (Left) & Previous Semesters Archive (Right) */}
+                      {(isStudentListVisible || filteredArchivedSchedules.length > 0) && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-start" id="schedules-auxiliary-row">
+                          {/* Left: Student List Link */}
+                          {isStudentListVisible && (
+                            <div
+                              id="student-list-container"
+                              className={`rounded-2xl border transition-all duration-300 overflow-hidden ${
+                                darkMode 
+                                  ? 'bg-slate-900/40 border-slate-800/80 backdrop-blur-md hover:border-blue-500/30' 
+                                  : 'bg-white/80 border-slate-200 shadow-sm hover:border-blue-500/30'
+                              } ${!filteredArchivedSchedules.length ? 'md:col-span-2' : ''}`}
+                            >
+                              <a
+                                href={STUDENT_LIST_RESOURCE.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                id="student-list-link-btn"
+                                className={`w-full p-4 sm:p-5 text-left flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 transition-colors cursor-pointer group ${
+                                  darkMode ? 'hover:bg-white/[0.02]' : 'hover:bg-slate-50/70'
+                                }`}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className="p-2 rounded-xl bg-blue-500/10 text-blue-500 flex-shrink-0 group-hover:scale-105 transition-transform">
+                                    <Users className="w-4 h-4" />
+                                  </div>
+                                  <div>
+                                    <div className="flex items-center gap-2">
+                                      <h3 className={`font-bold text-sm tracking-tight transition-colors group-hover:text-blue-500 ${
                                         darkMode ? 'text-slate-200' : 'text-slate-800'
                                       }`}>
-                                        {item.termTitle}
-                                      </h4>
+                                        {STUDENT_LIST_RESOURCE.title}
+                                      </h3>
                                     </div>
+                                    <p className={`text-[11px] mt-0.5 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                                      {STUDENT_LIST_RESOURCE.subtitle}
+                                    </p>
+                                  </div>
+                                </div>
 
-                                    <div className="pt-3 mt-3 border-t border-slate-200/50 dark:border-slate-800/40 flex items-center justify-between text-[11px]">
-                                      <span className={`font-mono text-[10px] font-semibold uppercase ${
-                                        darkMode ? 'text-slate-400 group-hover:text-orange-400' : 'text-slate-500 group-hover:text-orange-600'
+                                <div className="flex items-center gap-2 self-end sm:self-center">
+                                  <span className={`text-[11px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg border transition-all flex items-center gap-1.5 ${
+                                    darkMode 
+                                      ? 'bg-slate-800/80 border-slate-700 text-slate-300 group-hover:bg-blue-500/10 group-hover:border-blue-500/30 group-hover:text-blue-400' 
+                                      : 'bg-slate-100 border-slate-200 text-slate-600 group-hover:bg-blue-50 group-hover:border-blue-200 group-hover:text-blue-600'
+                                  }`}>
+                                    <span>View List</span>
+                                    <ArrowUpRight className="w-3.5 h-3.5 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                                  </span>
+                                </div>
+                              </a>
+                            </div>
+                          )}
+
+                          {/* Right: Previous Semesters Archive (Collapsible) */}
+                          {filteredArchivedSchedules.length > 0 && (
+                            <div className={`rounded-2xl border transition-all duration-300 overflow-hidden ${
+                              darkMode 
+                                ? 'bg-slate-900/40 border-slate-800/80 backdrop-blur-md' 
+                                : 'bg-white/80 border-slate-200 shadow-sm'
+                            } ${!isStudentListVisible ? 'md:col-span-2' : ''}`} id="previous-schedules-archive">
+                              {/* Interactive Header / Toggle Bar */}
+                              <button
+                                type="button"
+                                onClick={() => setIsArchiveExpanded(prev => !prev)}
+                                className={`w-full p-4 sm:p-5 text-left flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 transition-colors cursor-pointer ${
+                                  darkMode ? 'hover:bg-white/[0.02]' : 'hover:bg-slate-50/70'
+                                }`}
+                                id="toggle-archive-schedules-btn"
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className="p-2 rounded-xl bg-orange-500/10 text-orange-500 flex-shrink-0">
+                                    <History className="w-4 h-4" />
+                                  </div>
+                                  <div>
+                                    <div className="flex items-center gap-2">
+                                      <h3 className={`font-bold text-sm tracking-tight ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
+                                        Previous Semesters Archive
+                                      </h3>
+                                      <span className={`px-2 py-0.5 text-[10px] font-mono font-bold uppercase rounded border ${
+                                        darkMode 
+                                          ? 'bg-slate-800 border-slate-700 text-slate-300' 
+                                          : 'bg-slate-100 border-slate-200 text-slate-600'
                                       }`}>
-                                        View Schedule
+                                        {filteredArchivedSchedules.length}
                                       </span>
-                                      <ArrowUpRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-orange-500 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                                     </div>
-                                  </a>
-                                ))}
-                              </div>
+                                    <p className={`text-[11px] mt-0.5 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                                      {isArchiveExpanded || query.trim().length > 0 
+                                        ? 'Click to collapse previous academic term timetables' 
+                                        : 'Click to view historical timetables & past records'}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center gap-2 self-end sm:self-center">
+                                  <span className={`text-[11px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg border transition-all ${
+                                    (isArchiveExpanded || query.trim().length > 0)
+                                      ? (darkMode ? 'bg-orange-500/10 border-orange-500/30 text-orange-400' : 'bg-orange-50 border-orange-200 text-orange-600')
+                                      : (darkMode ? 'bg-slate-800/80 border-slate-700 text-slate-300 hover:text-white' : 'bg-slate-100 border-slate-200 text-slate-600 hover:text-slate-900')
+                                  }`}>
+                                    {(isArchiveExpanded || query.trim().length > 0) ? 'Collapse' : 'Archive'}
+                                  </span>
+                                  <div className={`p-1 rounded-lg transition-transform duration-300 ${
+                                    (isArchiveExpanded || query.trim().length > 0) ? 'rotate-180 text-orange-500' : 'text-slate-400'
+                                  }`}>
+                                    <ChevronDown className="w-4 h-4" />
+                                  </div>
+                                </div>
+                              </button>
+
+                              {/* Collapsible Content Body */}
+                              {(isArchiveExpanded || query.trim().length > 0) && (
+                                <div className="px-4 pb-4 sm:px-5 sm:pb-5 pt-1 border-t border-slate-200/60 dark:border-slate-800/50 animate-fadeIn" id="archive-schedules-body">
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3" id="archived-schedules-grid">
+                                    {filteredArchivedSchedules.map((item) => (
+                                      <a
+                                        key={item.id}
+                                        href={item.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        id={`archive-schedule-${item.id}`}
+                                        className={`group p-3.5 rounded-xl border transition-all duration-200 flex flex-col justify-between ${
+                                          darkMode
+                                            ? 'bg-slate-950/40 border-slate-800/80 hover:bg-white/5 hover:border-orange-500/30 hover:shadow-md'
+                                            : 'bg-slate-50/80 border-slate-200 hover:bg-sky-50/60 hover:border-orange-500/30 hover:shadow-sm'
+                                        }`}
+                                      >
+                                        <div>
+                                          <div className="flex items-center justify-between mb-2">
+                                            <span className="font-mono text-xs font-extrabold px-2 py-0.5 rounded bg-orange-500/10 text-orange-500 border border-orange-500/20">
+                                              {item.semester}
+                                            </span>
+                                            <span className={`text-[9.5px] font-mono font-medium ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                                              {item.academicYear}
+                                            </span>
+                                          </div>
+                                          <h4 className={`text-xs font-bold transition-colors group-hover:text-orange-500 ${
+                                            darkMode ? 'text-slate-200' : 'text-slate-800'
+                                          }`}>
+                                            {item.termTitle}
+                                          </h4>
+                                        </div>
+
+                                        <div className="pt-3 mt-3 border-t border-slate-200/50 dark:border-slate-800/40 flex items-center justify-between text-[11px]">
+                                          <span className={`font-mono text-[10px] font-semibold uppercase ${
+                                            darkMode ? 'text-slate-400 group-hover:text-orange-400' : 'text-slate-500 group-hover:text-orange-600'
+                                          }`}>
+                                            View Schedule
+                                          </span>
+                                          <ArrowUpRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-orange-500 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                                        </div>
+                                      </a>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>
