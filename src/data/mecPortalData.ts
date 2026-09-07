@@ -103,7 +103,7 @@ export interface StudentListResource {
 }
 
 export const STUDENT_LIST_RESOURCE: StudentListResource = {
-  title: "Student List_WS2026",
+  title: "MEC2025_Student List_WS2026",
   subtitle: "Official student intake rosters, class registrations & group allocations",
   cohort: "Official Roster",
   url: "https://docs.google.com/spreadsheets/d/178P07YRBWgoGiOgCbltsb-ELi536tn_s3vSif-_uZsk/edit?usp=sharing",

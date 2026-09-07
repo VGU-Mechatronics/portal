@@ -85,7 +85,7 @@ export interface SearchItem {
 
 const SEARCH_POOL: SearchItem[] = [
   {
-    title: 'Student List_WS2026 - Official Cohort Rosters & Enrolled Class Members',
+    title: 'MEC2025_Student List_WS2026 - Official Cohort Rosters & Enrolled Class Members',
     description: 'Official student intake rosters, class registrations and cohort group allocations for the MEC program',
     type: 'LINK' as const,
     category: 'Schedules & Exams',
