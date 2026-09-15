@@ -50,11 +50,59 @@ import {
   RotateCcw,
   Ban,
   Wrench,
-  Paperclip
+  Paperclip,
+  Lock
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import PortalCardComponent from './components/PortalCardComponent';
 import GradeConversionTable from './components/GradeConversionTable';
+import { TbaTabSection } from './components/TbaTabSection';
+
+const INTERNSHIP_UPCOMING_ITEMS = [
+  {
+    title: '1. Basic Internship (Vorpraxis)',
+    desc: '8-week practical training divided into Mechanical, Electrical, and Design sections. Auto-enrollment in Semester 1, independent module progression, and Semester 3 hard completion deadline.',
+    tag: 'TBA'
+  },
+  {
+    title: '2. Industrial Placement (Fachpraxis)',
+    desc: '12-week minimum full-time practical training at industrial enterprises or research laboratories with accredited training agreements and documentation.',
+    tag: 'TBA'
+  },
+  {
+    title: "3. Bachelor's Thesis (Abschlussarbeit)",
+    desc: '12 ECTS capstone engineering research project and defense co-supervised by German (HAW Hamburg) and Vietnamese (VGU) academic advisors.',
+    tag: 'TBA'
+  },
+  {
+    title: '4. Graduation Checklist & Degree Audits',
+    desc: 'Comprehensive degree audit covering 210 ECTS credit verification, IELTS ≥ 6.0 English certification, internship completions, and graduation clearance.',
+    tag: 'TBA'
+  }
+];
+
+const SCHOLARSHIP_UPCOMING_ITEMS = [
+  {
+    title: 'VGU Merit Scholarships',
+    desc: 'Annual competitive merit scholarships awarded to the top 15% (Categories A, B, and C) based on academic GPA and first-attempt examination criteria.',
+    tag: 'TBA'
+  },
+  {
+    title: '4-Year Full Scholarship Guidelines',
+    desc: 'Annual retention criteria, minimum GPA benchmarks (≤ 1.70 German / ≥ 8.70 Vietnamese scale), and maintenance audit procedures.',
+    tag: 'TBA'
+  },
+  {
+    title: 'HAW Hamburg Exchange Semester',
+    desc: 'Semester abroad exchange at Hamburg University of Applied Sciences, DAAD mobility grant opportunities, and international coursework.',
+    tag: 'TBA'
+  },
+  {
+    title: 'Industrial & Partner Grants',
+    desc: 'Corporate sponsorships, industry-funded tuition scholarships, and engineering project awards for Mechatronics students.',
+    tag: 'TBA'
+  }
+];
 import { 
   DUMMY_DRIVE_URL, 
   DUMMY_FORM_URL, 
@@ -245,7 +293,19 @@ export default function App() {
     }
   }, [activeTab]);
 
+  // Safety fallback: ensure activeTab never resolves to a locked tab
+  useEffect(() => {
+    const currentTab = PORTAL_TABS.find(t => t.id === activeTab);
+    if (currentTab && (currentTab as any).isLocked) {
+      setActiveTab('guidelines');
+    }
+  }, [activeTab]);
+
   const navigateToTabAndScroll = (targetTab: PortalTabId, targetElementId: string) => {
+    const targetTabObj = PORTAL_TABS.find(t => t.id === targetTab);
+    if (targetTabObj && (targetTabObj as any).isLocked) {
+      return;
+    }
     setActiveTab(targetTab);
     let attempts = 0;
     const interval = setInterval(() => {
@@ -286,13 +346,13 @@ export default function App() {
       item.category === 'Graduation Checklist' || 
       item.category === 'Graduation Checklists'
     ) {
-      targetTab = 'internship-thesis';
-      if (item.category === 'Basic Internship') setInternshipSubSection('basic');
-      else if (item.category === 'Industrial Placement') setInternshipSubSection('industrial');
-      else if (item.category === "Bachelor's Thesis" || item.category === 'Bachelor Thesis Milestones') setInternshipSubSection('thesis');
-      else if (item.category === 'Graduation Checklist' || item.category === 'Graduation Checklists') setInternshipSubSection('graduation');
+      setShowDropdown(false);
+      return;
     }
-    else if (item.category === 'Scholarships & Grants' || item.category === 'HAW Hamburg Exchange') targetTab = 'scholarship-exchange';
+    else if (item.category === 'Scholarships & Grants' || item.category === 'HAW Hamburg Exchange') {
+      setShowDropdown(false);
+      return;
+    }
     else if (item.category === 'Frequently Asked Questions') targetTab = 'faq';
 
     if (item.type === 'FAQ') {
@@ -665,9 +725,9 @@ export default function App() {
       case 'forms':
         return filteredFormCards.length;
       case 'internship-thesis':
-        return filteredIndustrialPlacementCards.length + filteredThesisCards.length + filteredGraduationCards.length + (basicInternshipMatches ? 1 : 0) + (industrialPlacementMatches ? 1 : 0) + (thesisOverviewMatches ? 1 : 0) + (graduationOverviewMatches ? 1 : 0);
+        return 0; // Tab is TBA & locked
       case 'scholarship-exchange':
-        return filteredScholarshipCards.length + filteredExchangeCards.length + (scholarshipOverviewMatches ? 1 : 0);
+        return 0; // Tab is TBA & locked
       case 'faq':
         return filteredFaqItems.length;
       default:
@@ -960,34 +1020,57 @@ export default function App() {
                 {PORTAL_TABS.map((tab) => {
                   const isActive = activeTab === tab.id;
                   const tabMatches = getTabMatchesCount(tab.id);
+                  const isLocked = Boolean((tab as any).isLocked);
                   
                   return (
                     <button
                       key={tab.id}
                       id={`nav-btn-${tab.id}`}
-                      onClick={() => {
+                      onClick={(e) => {
+                        if (isLocked) {
+                          e.preventDefault();
+                          return;
+                        }
                         setActiveTab(tab.id);
                       }}
+                      title={isLocked ? `${tab.label} (TBA)` : undefined}
                       className={`group flex items-center space-x-2 px-2.5 py-1.5 rounded-lg text-xs md:text-sm font-semibold whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] flex-shrink-0 border ${
-                        isActive
+                        isLocked
                           ? darkMode
-                            ? 'bg-gradient-to-b from-orange-500/25 via-orange-500/15 to-orange-600/30 text-orange-400 border-t-orange-400/40 border-x-orange-500/20 border-b-orange-600/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_4px_12px_rgba(249,115,22,0.25)] font-bold backdrop-blur-md hover:scale-102 active:scale-95 cursor-pointer'
-                            : 'bg-gradient-to-b from-orange-500/15 via-orange-500/5 to-orange-500/10 text-orange-600 border-t-orange-400/40 border-x-orange-400/20 border-b-orange-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_4px_12px_rgba(249,115,22,0.12)] font-bold backdrop-blur-md hover:scale-102 active:scale-95 cursor-pointer'
-                          : darkMode
-                            ? 'text-slate-400 border-t-white/10 border-x-white/5 border-b-black/30 bg-gradient-to-b from-slate-850/60 via-slate-900/40 to-slate-950/50 hover:text-slate-100 hover:from-slate-800/80 hover:to-slate-900/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.25)] hover:scale-102 active:scale-95 cursor-pointer'
-                            : 'text-slate-600 border-t-white border-x-white/80 border-b-slate-200/40 bg-gradient-to-b from-white/95 via-white/85 to-slate-100/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_2px_4px_rgba(0,0,0,0.02)] hover:text-blue-600 hover:from-sky-50 hover:to-blue-100/70 hover:shadow-md hover:border-b-blue-300 hover:shadow-blue-100/30 hover:scale-102 active:scale-95 cursor-pointer'
+                            ? 'opacity-60 cursor-not-allowed bg-slate-900/40 text-slate-400 border-slate-800'
+                            : 'opacity-65 cursor-not-allowed bg-slate-100/80 text-slate-500 border-slate-200'
+                          : isActive
+                            ? darkMode
+                              ? 'bg-gradient-to-b from-orange-500/25 via-orange-500/15 to-orange-600/30 text-orange-400 border-t-orange-400/40 border-x-orange-500/20 border-b-orange-600/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_4px_12px_rgba(249,115,22,0.25)] font-bold backdrop-blur-md hover:scale-102 active:scale-95 cursor-pointer'
+                              : 'bg-gradient-to-b from-orange-500/15 via-orange-500/5 to-orange-500/10 text-orange-600 border-t-orange-400/40 border-x-orange-400/20 border-b-orange-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_4px_12px_rgba(249,115,22,0.12)] font-bold backdrop-blur-md hover:scale-102 active:scale-95 cursor-pointer'
+                            : darkMode
+                              ? 'text-slate-400 border-t-white/10 border-x-white/5 border-b-black/30 bg-gradient-to-b from-slate-850/60 via-slate-900/40 to-slate-950/50 hover:text-slate-100 hover:from-slate-800/80 hover:to-slate-900/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.25)] hover:scale-102 active:scale-95 cursor-pointer'
+                              : 'text-slate-600 border-t-white border-x-white/80 border-b-slate-200/40 bg-gradient-to-b from-white/95 via-white/85 to-slate-100/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_2px_4px_rgba(0,0,0,0.02)] hover:text-blue-600 hover:from-sky-50 hover:to-blue-100/70 hover:shadow-md hover:border-b-blue-300 hover:shadow-blue-100/30 hover:scale-102 active:scale-95 cursor-pointer'
                       }`}
                     >
                       <span className={`transition-colors duration-300 ${
-                        isActive 
-                          ? darkMode ? 'text-orange-400' : 'text-orange-600' 
-                          : darkMode 
-                            ? 'text-slate-500 group-hover:text-slate-100' 
-                            : 'text-slate-400 group-hover:text-blue-600'
+                        isLocked
+                          ? 'text-amber-500/80'
+                          : isActive 
+                            ? darkMode ? 'text-orange-400' : 'text-orange-600' 
+                            : darkMode 
+                              ? 'text-slate-500 group-hover:text-slate-100' 
+                              : 'text-slate-400 group-hover:text-blue-600'
                       }`}>
                         {getTabIcon(tab.icon)}
                       </span>
                       <span>{tab.label}</span>
+                      {tab.isTba && (
+                        <span className={`px-1.5 py-0.2 text-[9px] font-black uppercase rounded tracking-wider border transition-colors ${
+                          isActive
+                            ? 'bg-amber-500 text-white border-amber-400'
+                            : darkMode
+                              ? 'bg-amber-500/15 text-amber-400 border-amber-500/30'
+                              : 'bg-amber-50 text-amber-600 border-amber-200'
+                        }`}>
+                          TBA
+                        </span>
+                      )}
                       {query && tabMatches > 0 && (
                         <span className={`ml-1.5 px-1.5 py-0.5 text-[10px] font-extrabold rounded-full transition-all duration-200 ${
                           isActive 
@@ -1021,34 +1104,57 @@ export default function App() {
                   {PORTAL_TABS.map((tab) => {
                     const isActive = activeTab === tab.id;
                     const tabMatches = getTabMatchesCount(tab.id);
+                    const isLocked = Boolean((tab as any).isLocked);
+
                     return (
                       <button
                         key={tab.id}
                         id={`mobile-nav-btn-${tab.id}`}
-                        onClick={() => {
+                        onClick={(e) => {
+                          if (isLocked) {
+                            e.preventDefault();
+                            return;
+                          }
                           setActiveTab(tab.id);
                           setIsMobileMenuOpen(false);
                         }}
                         className={`group flex items-center space-x-3 px-4 py-3 rounded-xl text-sm md:text-base font-semibold transition-all duration-300 w-full text-left border ${
-                          isActive
+                          isLocked
                             ? darkMode
-                              ? 'bg-gradient-to-b from-orange-500/25 via-orange-500/15 to-orange-600/30 text-orange-400 border-t-orange-400/40 border-x-orange-500/20 border-b-orange-600/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_4px_12px_rgba(249,115,22,0.25)] font-bold backdrop-blur-md hover:scale-[1.01] active:scale-95 cursor-pointer'
-                              : 'bg-gradient-to-b from-orange-500/15 via-orange-500/5 to-orange-500/10 text-orange-600 border-t-orange-400/40 border-x-orange-400/20 border-b-orange-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_4px_12px_rgba(249,115,22,0.12)] font-bold backdrop-blur-md hover:scale-[1.01] active:scale-95 cursor-pointer'
-                            : darkMode
-                              ? 'text-slate-400 border-t-white/10 border-x-white/5 border-b-black/30 bg-gradient-to-b from-slate-850/60 via-slate-900/40 to-slate-950/50 hover:text-slate-100 hover:from-slate-800/80 hover:to-slate-900/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.25)] hover:scale-[1.01] active:scale-95 cursor-pointer'
-                              : 'text-slate-600 border-t-white border-x-white/80 border-b-slate-200/40 bg-gradient-to-b from-white/95 via-white/85 to-slate-100/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_2px_4px_rgba(0,0,0,0.02)] hover:text-blue-600 hover:from-sky-50 hover:to-blue-100/70 hover:shadow-md hover:border-b-blue-300 hover:shadow-blue-100/30 hover:scale-[1.01] active:scale-95 cursor-pointer'
+                              ? 'opacity-60 cursor-not-allowed bg-slate-900/40 text-slate-400 border-slate-800'
+                              : 'opacity-65 cursor-not-allowed bg-slate-100/80 text-slate-500 border-slate-200'
+                            : isActive
+                              ? darkMode
+                                ? 'bg-gradient-to-b from-orange-500/25 via-orange-500/15 to-orange-600/30 text-orange-400 border-t-orange-400/40 border-x-orange-500/20 border-b-orange-600/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_4px_12px_rgba(249,115,22,0.25)] font-bold backdrop-blur-md hover:scale-[1.01] active:scale-95 cursor-pointer'
+                                : 'bg-gradient-to-b from-orange-500/15 via-orange-500/5 to-orange-500/10 text-orange-600 border-t-orange-400/40 border-x-orange-400/20 border-b-orange-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_4px_12px_rgba(249,115,22,0.12)] font-bold backdrop-blur-md hover:scale-[1.01] active:scale-95 cursor-pointer'
+                              : darkMode
+                                ? 'text-slate-400 border-t-white/10 border-x-white/5 border-b-black/30 bg-gradient-to-b from-slate-850/60 via-slate-900/40 to-slate-950/50 hover:text-slate-100 hover:from-slate-800/80 hover:to-slate-900/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.25)] hover:scale-[1.01] active:scale-95 cursor-pointer'
+                                : 'text-slate-600 border-t-white border-x-white/80 border-b-slate-200/40 bg-gradient-to-b from-white/95 via-white/85 to-slate-100/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_2px_4px_rgba(0,0,0,0.02)] hover:text-blue-600 hover:from-sky-50 hover:to-blue-100/70 hover:shadow-md hover:border-b-blue-300 hover:shadow-blue-100/30 hover:scale-[1.01] active:scale-95 cursor-pointer'
                         }`}
                       >
                         <span className={`transition-colors duration-300 ${
-                          isActive 
-                            ? darkMode ? 'text-orange-400' : 'text-orange-600' 
-                            : darkMode 
-                              ? 'text-slate-500 group-hover:text-slate-100' 
-                              : 'text-slate-400 group-hover:text-blue-600'
+                          isLocked
+                            ? 'text-amber-500/80'
+                            : isActive 
+                              ? darkMode ? 'text-orange-400' : 'text-orange-600' 
+                              : darkMode 
+                                ? 'text-slate-500 group-hover:text-slate-100' 
+                                : 'text-slate-400 group-hover:text-blue-600'
                         }`}>
                           {getTabIcon(tab.icon)}
                         </span>
                         <span className="flex-1">{tab.label}</span>
+                        {tab.isTba && (
+                          <span className={`px-2 py-0.5 text-[10px] font-black uppercase rounded tracking-wider border ${
+                            isActive
+                              ? 'bg-amber-500 text-white border-amber-400'
+                              : darkMode
+                                ? 'bg-amber-500/15 text-amber-400 border-amber-500/30'
+                                : 'bg-amber-50 text-amber-600 border-amber-200'
+                          }`}>
+                            TBA
+                          </span>
+                        )}
                         {query && tabMatches > 0 && (
                           <span className={`px-1.5 py-0.5 text-[10px] font-extrabold rounded-full transition-all duration-200 ${
                             isActive 
@@ -1168,11 +1274,26 @@ export default function App() {
 
                         if (results.length > 0) {
                           return results.map((item, idx) => {
+                            const isItemLocked = 
+                              item.category === 'Basic Internship' || 
+                              item.category === 'Industrial Placement' || 
+                              item.category === 'Internship Documents' || 
+                              item.category === "Bachelor's Thesis" || 
+                              item.category === 'Bachelor Thesis Milestones' || 
+                              item.category === 'Graduation Checklist' || 
+                              item.category === 'Graduation Checklists' ||
+                              item.category === 'Scholarships & Grants' || 
+                              item.category === 'HAW Hamburg Exchange';
+
                             return (
                               <div
                                 key={idx}
                                 onClick={() => handleItemClick(item)}
-                                className={`p-4 transition-all duration-200 ease-out cursor-pointer text-left flex justify-between items-start gap-3 group relative ${
+                                className={`p-4 transition-all duration-200 ease-out text-left flex justify-between items-start gap-3 group relative ${
+                                  isItemLocked
+                                    ? 'cursor-not-allowed opacity-75'
+                                    : 'cursor-pointer'
+                                } ${
                                   darkMode
                                     ? 'hover:bg-white/5 hover:text-white'
                                     : 'hover:bg-sky-50/60 hover:text-blue-600'
@@ -1198,6 +1319,11 @@ export default function App() {
                                     }`}>
                                       {item.type}
                                     </span>
+                                    {isItemLocked && (
+                                      <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+                                        TBA
+                                      </span>
+                                    )}
                                   </div>
                                   <h4 className={`text-xs md:text-sm font-bold truncate ${
                                     darkMode ? 'text-slate-100 group-hover:text-orange-400' : 'text-slate-800 group-hover:text-blue-600'
@@ -1213,9 +1339,13 @@ export default function App() {
                                   )}
                                 </div>
                                 <div className="flex-shrink-0 self-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                  <ArrowUpRight className={`w-4 h-4 ${
-                                    darkMode ? 'text-orange-400' : 'text-blue-500'
-                                  }`} />
+                                  {isItemLocked ? (
+                                    <Lock className="w-4 h-4 text-amber-500" />
+                                  ) : (
+                                    <ArrowUpRight className={`w-4 h-4 ${
+                                      darkMode ? 'text-orange-400' : 'text-blue-500'
+                                    }`} />
+                                  )}
                                 </div>
                               </div>
                             );
@@ -2969,9 +3099,19 @@ export default function App() {
                 </div>
               )}
 
-              {/* 5. INTERNSHIP & BACHELOR THESIS - 4 DEDICATED SECTIONS */}
+              {/* 5. INTERNSHIP & BACHELOR THESIS - TBA */}
               {activeTab === 'internship-thesis' && (
-                <div className="space-y-8" id="section-internship-thesis">
+                <TbaTabSection
+                  title="Internship & Bachelor Thesis"
+                  icon={<GraduationCap className="w-6 h-6 text-amber-500" />}
+                  badgeLabel="To Be Announced (TBA)"
+                  headline="Under Regulatory Review:"
+                  description="Essential guidelines, regulatory frameworks, supervisor sign-offs, and downloadable document packages across all 4 key stages: Basic Internship, Industrial Placement, Bachelor's Thesis, and Graduation Checklist are currently being updated and will be announced soon."
+                  upcomingItems={INTERNSHIP_UPCOMING_ITEMS}
+                  darkMode={darkMode}
+                  sectionId="section-internship-thesis"
+                  draftContent={
+                    <div className="space-y-8">
                   {/* Tab Banner & Section Navigator */}
                   <div className={`p-6 md:p-8 rounded-2xl border transition-colors ${
                     darkMode ? 'bg-slate-900/40 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
@@ -3476,12 +3616,24 @@ export default function App() {
                       )}
                     </div>
                   )}
-                </div>
+                    </div>
+                  }
+                />
               )}
 
-              {/* 6. SCHOLARSHIP & EXCHANGE */}
+              {/* 6. SCHOLARSHIP & EXCHANGE - TBA */}
               {activeTab === 'scholarship-exchange' && (
-                <div className="space-y-8" id="section-scholarship-exchange">
+                <TbaTabSection
+                  title="Scholarship & Exchange"
+                  icon={<Globe className="w-6 h-6 text-amber-500" />}
+                  badgeLabel="To Be Announced (TBA)"
+                  headline="Under Policy Review:"
+                  description="Official regulations, eligibility criteria, GPA calculation rules, and application procedures for VGU Merit Scholarships, 4-Year Full Scholarships, and HAW Hamburg Exchange Semester are currently being finalized and will be announced soon."
+                  upcomingItems={SCHOLARSHIP_UPCOMING_ITEMS}
+                  darkMode={darkMode}
+                  sectionId="section-scholarship-exchange"
+                  draftContent={
+                    <div className="space-y-8">
                   {/* Part A: Scholarships */}
                   {filteredScholarshipCards.length > 0 && (
                     <div className="space-y-4">
@@ -4102,7 +4254,9 @@ export default function App() {
                       )}
                     </div>
                   )}
-                </div>
+                    </div>
+                  }
+                />
               )}
 
               {/* 7. FAQ */}

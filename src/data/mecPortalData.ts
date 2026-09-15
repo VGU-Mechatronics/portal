@@ -28,13 +28,13 @@ export const DUMMY_DRIVE_URL = "https://drive.google.com/drive/folders/1dummy-me
 export const DUMMY_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSf_dummy-mec-vgu-form-placeholder/viewform";
 
 export const PORTAL_TABS = [
-  { id: 'guidelines', label: 'Guidelines', icon: 'BookOpen' },
-  { id: 'schedules-exams', label: 'Schedules & Exams', icon: 'Calendar' },
-  { id: 'curriculum-regulations', label: 'Curriculum & Regulations', icon: 'Cpu' },
-  { id: 'forms', label: 'Forms', icon: 'ClipboardList' },
-  { id: 'internship-thesis', label: 'Internship & Bachelor Thesis', icon: 'GraduationCap' },
-  { id: 'scholarship-exchange', label: 'Scholarship & Exchange', icon: 'Globe' },
-  { id: 'faq', label: 'FAQ', icon: 'HelpCircle' }
+  { id: 'guidelines', label: 'Guidelines', icon: 'BookOpen', isTba: false, isLocked: false },
+  { id: 'schedules-exams', label: 'Schedules & Exams', icon: 'Calendar', isTba: false, isLocked: false },
+  { id: 'curriculum-regulations', label: 'Curriculum & Regulations', icon: 'Cpu', isTba: false, isLocked: false },
+  { id: 'forms', label: 'Forms', icon: 'ClipboardList', isTba: false, isLocked: false },
+  { id: 'internship-thesis', label: 'Internship & Bachelor Thesis', icon: 'GraduationCap', isTba: true, isLocked: true },
+  { id: 'scholarship-exchange', label: 'Scholarship & Exchange', icon: 'Globe', isTba: true, isLocked: true },
+  { id: 'faq', label: 'FAQ', icon: 'HelpCircle', isTba: false, isLocked: false }
 ] as const;
 
 export type PortalTabId = typeof PORTAL_TABS[number]['id'];
