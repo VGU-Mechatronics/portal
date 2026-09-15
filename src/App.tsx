@@ -48,7 +48,9 @@ import {
   XCircle,
   AlertTriangle,
   RotateCcw,
-  Ban
+  Ban,
+  Wrench,
+  Paperclip
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import PortalCardComponent from './components/PortalCardComponent';
@@ -67,6 +69,8 @@ import {
   REGULATION_CARDS,
   FORM_CARDS,
   INTERNSHIP_CARDS,
+  BASIC_INTERNSHIP_CARDS,
+  INDUSTRIAL_PLACEMENT_CARDS,
   SCHOLARSHIP_CARDS,
   THESIS_CARDS,
   GRADUATION_CARDS,
@@ -145,12 +149,26 @@ const SEARCH_POOL: SearchItem[] = [
   })),
   ...CURRICULUM_CARDS.map(c => ({ ...c, category: 'Curriculum & Handbooks' as string })),
   ...REGULATION_CARDS.map(c => ({ ...c, category: 'Academic Regulations' as string })),
-  // Temporarily hidden per user request (will be updated later)
-  // ...INTERNSHIP_CARDS.map(c => ({ ...c, category: 'Internship Documents' as string })),
-  // ...THESIS_CARDS.map(c => ({ ...c, category: 'Bachelor Thesis Milestones' as string })),
-  // ...GRADUATION_CARDS.map(c => ({ ...c, category: 'Graduation Checklists' as string })),
-  // ...SCHOLARSHIP_CARDS.map(c => ({ ...c, category: 'Scholarships & Grants' as string })),
-  // ...EXCHANGE_CARDS.map(c => ({ ...c, category: 'HAW Hamburg Exchange' as string })),
+  {
+    title: 'MEC - Important Regulations on Basic Internship (Faculty Notice)',
+    description: 'Official notice from Ms. Yen Tran: 3 mandatory sections (Design, Mechanical, Electrical), pass all 3 for HAW Hamburg, hard deadline end of Semester 3, free re-enrollment, 15,000,000 VND fee',
+    type: 'LINK' as const,
+    category: 'Basic Internship',
+    url: '#basic-internship-email-regulations'
+  },
+  {
+    title: 'HAW Mechatronik Vorpraxis Richtlinie (PDF)',
+    description: 'Official HAW Hamburg Basic Internship Regulations (HAW_Mechatronik_Vorpraxis_Richtlinie en-GB.pdf) attached to program announcement',
+    type: 'PDF' as const,
+    category: 'Basic Internship',
+    url: DUMMY_DRIVE_URL
+  },
+  ...BASIC_INTERNSHIP_CARDS.map(c => ({ ...c, category: 'Basic Internship' as string })),
+  ...INDUSTRIAL_PLACEMENT_CARDS.map(c => ({ ...c, category: 'Industrial Placement' as string })),
+  ...THESIS_CARDS.map(c => ({ ...c, category: "Bachelor's Thesis" as string })),
+  ...GRADUATION_CARDS.map(c => ({ ...c, category: 'Graduation Checklist' as string })),
+  ...SCHOLARSHIP_CARDS.map(c => ({ ...c, category: 'Scholarships & Grants' as string })),
+  ...EXCHANGE_CARDS.map(c => ({ ...c, category: 'HAW Hamburg Exchange' as string })),
   ...FAQ_ITEMS.map(f => ({
     title: f.question,
     description: f.answer,
@@ -195,6 +213,7 @@ export default function App() {
   const [chkFullCumulativeGPA, setChkFullCumulativeGPA] = useState<string>('');
   const [chkFullGPAScale, setChkFullGPAScale] = useState<'german' | 'vietnamese'>('german');
   const [scholarshipSubTab, setScholarshipSubTab] = useState<'rules' | 'full' | 'checker'>('rules');
+  const [internshipSubSection, setInternshipSubSection] = useState<'all' | 'basic' | 'industrial' | 'thesis' | 'graduation'>('all');
   const searchContainerRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -226,47 +245,93 @@ export default function App() {
     }
   }, [activeTab]);
 
-  // Guard against navigating to disabled tabs (will be updated later)
-  useEffect(() => {
-    if (activeTab === 'internship-thesis' || activeTab === 'scholarship-exchange') {
-      setActiveTab('guidelines');
-    }
-  }, [activeTab]);
+  const navigateToTabAndScroll = (targetTab: PortalTabId, targetElementId: string) => {
+    setActiveTab(targetTab);
+    let attempts = 0;
+    const interval = setInterval(() => {
+      attempts++;
+      let el = document.getElementById(targetElementId);
+      if (!el && (targetElementId === 'section-grade-conversion-table' || targetElementId === 'section-grade-conversion-wrapper')) {
+        el = document.getElementById('section-grade-conversion-wrapper') || document.getElementById('section-grade-conversion-table');
+      }
+      if (el) {
+        clearInterval(interval);
+        setTimeout(() => {
+          el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 60);
+      } else if (attempts > 35) {
+        clearInterval(interval);
+      }
+    }, 40);
+  };
 
   const handleItemClick = (item: SearchItem) => {
     let targetTab: PortalTabId = 'guidelines';
     if (item.category === 'Forms & Petitions') targetTab = 'forms';
     else if (item.category === 'Exam Administrative Forms') targetTab = 'schedules-exams';
-    else if (item.category === 'Schedules') targetTab = 'schedules-exams';
-    else if (item.category === 'Curriculum & Handbooks') targetTab = 'curriculum-regulations';
-    else if (item.category === 'Academic Regulations') targetTab = 'curriculum-regulations';
+    else if (item.category === 'Schedules' || item.category === 'Previous Schedules Archive') targetTab = 'schedules-exams';
+    else if (
+      item.category === 'Curriculum & Handbooks' || 
+      item.category === 'Academic Regulations' || 
+      item.category === 'Curriculum & Regulations'
+    ) {
+      targetTab = 'curriculum-regulations';
+    }
+    else if (
+      item.category === 'Basic Internship' || 
+      item.category === 'Industrial Placement' || 
+      item.category === 'Internship Documents' || 
+      item.category === "Bachelor's Thesis" || 
+      item.category === 'Bachelor Thesis Milestones' || 
+      item.category === 'Graduation Checklist' || 
+      item.category === 'Graduation Checklists'
+    ) {
+      targetTab = 'internship-thesis';
+      if (item.category === 'Basic Internship') setInternshipSubSection('basic');
+      else if (item.category === 'Industrial Placement') setInternshipSubSection('industrial');
+      else if (item.category === "Bachelor's Thesis" || item.category === 'Bachelor Thesis Milestones') setInternshipSubSection('thesis');
+      else if (item.category === 'Graduation Checklist' || item.category === 'Graduation Checklists') setInternshipSubSection('graduation');
+    }
+    else if (item.category === 'Scholarships & Grants' || item.category === 'HAW Hamburg Exchange') targetTab = 'scholarship-exchange';
     else if (item.category === 'Frequently Asked Questions') targetTab = 'faq';
 
-    setActiveTab(targetTab);
-
     if (item.type === 'FAQ') {
+      setActiveTab(targetTab);
       const faqIdx = FAQ_ITEMS.findIndex(f => f.question === item.title);
       if (faqIdx !== -1) {
         setFaqOpenState(prev => ({ ...prev, [faqIdx]: true }));
-        setTimeout(() => {
+        let attempts = 0;
+        const interval = setInterval(() => {
+          attempts++;
           const el = document.getElementById(`faq-btn-${faqIdx}`);
-          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 150);
+          if (el) {
+            clearInterval(interval);
+            setTimeout(() => {
+              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 60);
+          } else if (attempts > 30) {
+            clearInterval(interval);
+          }
+        }, 40);
       }
+    } else if (item.url && item.url.startsWith('#')) {
+      const targetElementId = item.url.substring(1);
+      navigateToTabAndScroll(targetTab, targetElementId);
     } else {
-      setTimeout(() => {
+      setActiveTab(targetTab);
+      let attempts = 0;
+      const interval = setInterval(() => {
+        attempts++;
         const el = document.getElementById('portal-content-stage');
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 150);
-    }
+        if (el) {
+          clearInterval(interval);
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else if (attempts > 25) {
+          clearInterval(interval);
+        }
+      }, 40);
 
-    if (item.url) {
-      if (item.url.startsWith('#')) {
-        setTimeout(() => {
-          const el = document.getElementById(item.url!.substring(1));
-          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 200);
-      } else {
+      if (item.url) {
         if (item.url.includes('drive.google.com') || item.url.includes('docs.google.com')) {
           if (typeof window !== 'undefined' && (window as any).gtag) {
             (window as any).gtag('event', 'document_download', {
@@ -433,6 +498,14 @@ export default function App() {
     ? THESIS_CARDS.filter(c => c.title.toLowerCase().includes(query) || (c.description && c.description.toLowerCase().includes(query)))
     : THESIS_CARDS;
 
+  const filteredBasicInternshipCards = query 
+    ? BASIC_INTERNSHIP_CARDS.filter(c => c.title.toLowerCase().includes(query) || (c.description && c.description.toLowerCase().includes(query)))
+    : BASIC_INTERNSHIP_CARDS;
+
+  const filteredIndustrialPlacementCards = query 
+    ? INDUSTRIAL_PLACEMENT_CARDS.filter(c => c.title.toLowerCase().includes(query) || (c.description && c.description.toLowerCase().includes(query)))
+    : INDUSTRIAL_PLACEMENT_CARDS;
+
   const filteredInternshipCards = query 
     ? INTERNSHIP_CARDS.filter(c => c.title.toLowerCase().includes(query) || (c.description && c.description.toLowerCase().includes(query)))
     : INTERNSHIP_CARDS;
@@ -505,18 +578,43 @@ export default function App() {
   const thesisOverviewMatches = !query ||
     "Bachelor Thesis Guidelines".toLowerCase().includes(query) ||
     "Bachelor Thesis Milestones & Deliverables".toLowerCase().includes(query) ||
+    "bachelor's thesis".toLowerCase().includes(query) ||
+    "đồ án tốt nghiệp".toLowerCase().includes(query) ||
     "The final Bachelor Thesis (12 ECTS) is the capstone engineering achievement. It represents independent research addressing complex mechanical, hardware controller, and embedded software intersections.".toLowerCase().includes(query) ||
     "Stage 1 Proposal Month 1 Stage 2 Literature Month 2 Stage 3 Prototyping Months 3-4 Stage 4 Draft Writing Month 5 Stage 5 Defense Month 6".toLowerCase().includes(query);
 
-  const internshipOverviewMatches = !query ||
-    "Basic & Professional Internship".toLowerCase().includes(query) ||
+  const basicInternshipMatches = !query ||
     "Basic Internship (Minimum 8 Weeks)".toLowerCase().includes(query) ||
-    "Focused on fundamental mechanical operations, metal machining (turning, milling, drilling), basic electrical wiring, PCB fabrication, and technical draftings. Must be completed in registered industrial training workshops or approved mechatronic production lines before entering year 3.".toLowerCase().includes(query) ||
-    "Professional Internship (Minimum 12 Weeks)".toLowerCase().includes(query) ||
-    "An advanced placement centering on systems engineering, factory automation (PLC/SCADA loops), software controls, or mechanical hardware design. Undertaken in reputable multi-national engineering firms or research facilities. Requires a dual sign-off from both VGU coordinator and corporate advisor.".toLowerCase().includes(query);
+    "Basic Internship".toLowerCase().includes(query) ||
+    "thực tập cơ sở".toLowerCase().includes(query) ||
+    "MEC - Important Regulations on Basic Internship".toLowerCase().includes(query) ||
+    "Structure of the Basic Internship Design Mechanical Electrical".toLowerCase().includes(query) ||
+    "pass all three sections HAW Hamburg".toLowerCase().includes(query) ||
+    "Study Progression & Deadlines Hard Deadline end of Semester 3".toLowerCase().includes(query) ||
+    "Semester 4 defer studies Re-enrollment Policy".toLowerCase().includes(query) ||
+    "Tuition Fee 15,000,000 VND 15000000 15 triệu".toLowerCase().includes(query) ||
+    "No additional fees are charged for re-enrolling in failed sections".toLowerCase().includes(query) ||
+    "Registration for Re-enrollment Yen Tran HAW_Mechatronik_Vorpraxis_Richtlinie".toLowerCase().includes(query) ||
+    "auto enroll kỳ 1 khong can dang ky re-enroll phan rot dang ky lai".toLowerCase().includes(query) ||
+    "failed 1 section continue remaining sections failed design section electrical mechanical".toLowerCase().includes(query) ||
+    "rớt 1 section vẫn được học tiếp các section còn lại".toLowerCase().includes(query) ||
+    "metal machining turning milling drilling basic electrical wiring pcb fabrication".toLowerCase().includes(query) ||
+    "industrial training workshops approved mechatronic production lines before entering year 3 semester 4 progression".toLowerCase().includes(query);
+
+  const industrialPlacementMatches = !query ||
+    "Industrial Placement (Minimum 12 Weeks)".toLowerCase().includes(query) ||
+    "Industrial Placement".toLowerCase().includes(query) ||
+    "Professional Internship".toLowerCase().includes(query) ||
+    "thực tập chuyên ngành thực tập doanh nghiệp".toLowerCase().includes(query) ||
+    "systems engineering factory automation plc scada loops software controls mechatronic design".toLowerCase().includes(query) ||
+    "dual sign-off vgu coordinator and corporate advisor introductory recommendation letter".toLowerCase().includes(query);
+
+  const internshipOverviewMatches = basicInternshipMatches || industrialPlacementMatches;
 
   const graduationOverviewMatches = !query ||
     "Final Graduation Academic Audits".toLowerCase().includes(query) ||
+    "Graduation Checklist".toLowerCase().includes(query) ||
+    "điều kiện tốt nghiệp".toLowerCase().includes(query) ||
     "Students are advised to initiate the academic clearance audit during Year 4 Semester 2. All credits including basic studies, professional internship, and the Bachelor Thesis must be fully computed on SIS grade sheets.".toLowerCase().includes(query) ||
     "Satisfy 210 ECTS Credit Target IELTS 6.0 English Proficiency level Complete both Internship stages".toLowerCase().includes(query);
 
@@ -550,14 +648,13 @@ export default function App() {
   const totalMatchesCount = query 
     ? (filteredInfoChannels.length + filteredScheduleCards.length + filteredExamCards.length + filteredCurriculumCards.length + 
        filteredRegulationCards.length + filteredFormCards.length + filteredThesisCards.length + 
-       filteredInternshipCards.length + filteredGraduationCards.length + filteredScholarshipCards.length + 
+       filteredIndustrialPlacementCards.length + filteredGraduationCards.length + filteredScholarshipCards.length + 
        filteredExchangeCards.length + filteredFaqItems.length + (scholarshipOverviewMatches ? 1 : 0) + 
-       (gradeConversionMatches ? 1 : 0))
+       (gradeConversionMatches ? 1 : 0) + (basicInternshipMatches ? 1 : 0) + (industrialPlacementMatches ? 1 : 0))
     : 0;
 
   const getTabMatchesCount = (tabId: string) => {
     if (!query) return 0;
-    if (tabId === 'internship-thesis' || tabId === 'scholarship-exchange') return 0;
     switch (tabId) {
       case 'guidelines':
         return filteredInfoChannels.length;
@@ -568,9 +665,9 @@ export default function App() {
       case 'forms':
         return filteredFormCards.length;
       case 'internship-thesis':
-        return 0;
+        return filteredIndustrialPlacementCards.length + filteredThesisCards.length + filteredGraduationCards.length + (basicInternshipMatches ? 1 : 0) + (industrialPlacementMatches ? 1 : 0) + (thesisOverviewMatches ? 1 : 0) + (graduationOverviewMatches ? 1 : 0);
       case 'scholarship-exchange':
-        return 0;
+        return filteredScholarshipCards.length + filteredExchangeCards.length + (scholarshipOverviewMatches ? 1 : 0);
       case 'faq':
         return filteredFaqItems.length;
       default:
@@ -863,24 +960,16 @@ export default function App() {
                 {PORTAL_TABS.map((tab) => {
                   const isActive = activeTab === tab.id;
                   const tabMatches = getTabMatchesCount(tab.id);
-                  const isPendingTab = tab.id === 'internship-thesis' || tab.id === 'scholarship-exchange';
                   
                   return (
                     <button
                       key={tab.id}
                       id={`nav-btn-${tab.id}`}
                       onClick={() => {
-                        if (!isPendingTab) {
-                          setActiveTab(tab.id);
-                        }
+                        setActiveTab(tab.id);
                       }}
-                      disabled={isPendingTab}
-                      aria-disabled={isPendingTab}
-                      title={isPendingTab ? "Nội dung đang được chuẩn bị (sẽ cập nhật sau) - Chưa khả dụng" : undefined}
                       className={`group flex items-center space-x-2 px-2.5 py-1.5 rounded-lg text-xs md:text-sm font-semibold whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] flex-shrink-0 border ${
-                        isPendingTab
-                          ? 'opacity-35 select-none cursor-not-allowed border-dashed border-slate-300 dark:border-slate-800 bg-slate-100/40 dark:bg-slate-900/30 text-slate-400 dark:text-slate-600 grayscale pointer-events-auto shadow-none'
-                          : isActive
+                        isActive
                           ? darkMode
                             ? 'bg-gradient-to-b from-orange-500/25 via-orange-500/15 to-orange-600/30 text-orange-400 border-t-orange-400/40 border-x-orange-500/20 border-b-orange-600/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_4px_12px_rgba(249,115,22,0.25)] font-bold backdrop-blur-md hover:scale-102 active:scale-95 cursor-pointer'
                             : 'bg-gradient-to-b from-orange-500/15 via-orange-500/5 to-orange-500/10 text-orange-600 border-t-orange-400/40 border-x-orange-400/20 border-b-orange-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_4px_12px_rgba(249,115,22,0.12)] font-bold backdrop-blur-md hover:scale-102 active:scale-95 cursor-pointer'
@@ -890,9 +979,7 @@ export default function App() {
                       }`}
                     >
                       <span className={`transition-colors duration-300 ${
-                        isPendingTab
-                          ? 'text-slate-400 dark:text-slate-600'
-                          : isActive 
+                        isActive 
                           ? darkMode ? 'text-orange-400' : 'text-orange-600' 
                           : darkMode 
                             ? 'text-slate-500 group-hover:text-slate-100' 
@@ -901,20 +988,14 @@ export default function App() {
                         {getTabIcon(tab.icon)}
                       </span>
                       <span>{tab.label}</span>
-                      {isPendingTab ? (
-                        <span className="text-[10px] font-medium tracking-tight px-1.5 py-0.5 rounded bg-slate-200/70 dark:bg-slate-800 text-slate-500 dark:text-slate-400 ml-1">
-                          TBA
+                      {query && tabMatches > 0 && (
+                        <span className={`ml-1.5 px-1.5 py-0.5 text-[10px] font-extrabold rounded-full transition-all duration-200 ${
+                          isActive 
+                            ? 'bg-white text-orange-600 font-bold' 
+                            : 'bg-orange-500 text-white'
+                        }`}>
+                          {tabMatches}
                         </span>
-                      ) : (
-                        query && tabMatches > 0 && (
-                          <span className={`ml-1.5 px-1.5 py-0.5 text-[10px] font-extrabold rounded-full transition-all duration-200 ${
-                            isActive 
-                              ? 'bg-white text-orange-600 font-bold' 
-                              : 'bg-orange-500 text-white'
-                          }`}>
-                            {tabMatches}
-                          </span>
-                        )
                       )}
                     </button>
                   );
@@ -940,36 +1021,26 @@ export default function App() {
                   {PORTAL_TABS.map((tab) => {
                     const isActive = activeTab === tab.id;
                     const tabMatches = getTabMatchesCount(tab.id);
-                    const isPendingTab = tab.id === 'internship-thesis' || tab.id === 'scholarship-exchange';
                     return (
                       <button
                         key={tab.id}
                         id={`mobile-nav-btn-${tab.id}`}
                         onClick={() => {
-                          if (!isPendingTab) {
-                            setActiveTab(tab.id);
-                            setIsMobileMenuOpen(false);
-                          }
+                          setActiveTab(tab.id);
+                          setIsMobileMenuOpen(false);
                         }}
-                        disabled={isPendingTab}
-                        aria-disabled={isPendingTab}
-                        title={isPendingTab ? "Nội dung đang được chuẩn bị (sẽ cập nhật sau) - Chưa khả dụng" : undefined}
                         className={`group flex items-center space-x-3 px-4 py-3 rounded-xl text-sm md:text-base font-semibold transition-all duration-300 w-full text-left border ${
-                          isPendingTab
-                            ? 'opacity-35 select-none cursor-not-allowed border-dashed border-slate-300 dark:border-slate-800 bg-slate-100/40 dark:bg-slate-900/30 text-slate-400 dark:text-slate-600 grayscale pointer-events-auto'
-                            : isActive
-                              ? darkMode
-                                ? 'bg-gradient-to-b from-orange-500/25 via-orange-500/15 to-orange-600/30 text-orange-400 border-t-orange-400/40 border-x-orange-500/20 border-b-orange-600/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_4px_12px_rgba(249,115,22,0.25)] font-bold backdrop-blur-md hover:scale-[1.01] active:scale-95 cursor-pointer'
-                                : 'bg-gradient-to-b from-orange-500/15 via-orange-500/5 to-orange-500/10 text-orange-600 border-t-orange-400/40 border-x-orange-400/20 border-b-orange-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_4px_12px_rgba(249,115,22,0.12)] font-bold backdrop-blur-md hover:scale-[1.01] active:scale-95 cursor-pointer'
-                              : darkMode
-                                ? 'text-slate-400 border-t-white/10 border-x-white/5 border-b-black/30 bg-gradient-to-b from-slate-850/60 via-slate-900/40 to-slate-950/50 hover:text-slate-100 hover:from-slate-800/80 hover:to-slate-900/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.25)] hover:scale-[1.01] active:scale-95 cursor-pointer'
-                                : 'text-slate-600 border-t-white border-x-white/80 border-b-slate-200/40 bg-gradient-to-b from-white/95 via-white/85 to-slate-100/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_2px_4px_rgba(0,0,0,0.02)] hover:text-blue-600 hover:from-sky-50 hover:to-blue-100/70 hover:shadow-md hover:border-b-blue-300 hover:shadow-blue-100/30 hover:scale-[1.01] active:scale-95 cursor-pointer'
+                          isActive
+                            ? darkMode
+                              ? 'bg-gradient-to-b from-orange-500/25 via-orange-500/15 to-orange-600/30 text-orange-400 border-t-orange-400/40 border-x-orange-500/20 border-b-orange-600/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_4px_12px_rgba(249,115,22,0.25)] font-bold backdrop-blur-md hover:scale-[1.01] active:scale-95 cursor-pointer'
+                              : 'bg-gradient-to-b from-orange-500/15 via-orange-500/5 to-orange-500/10 text-orange-600 border-t-orange-400/40 border-x-orange-400/20 border-b-orange-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_4px_12px_rgba(249,115,22,0.12)] font-bold backdrop-blur-md hover:scale-[1.01] active:scale-95 cursor-pointer'
+                            : darkMode
+                              ? 'text-slate-400 border-t-white/10 border-x-white/5 border-b-black/30 bg-gradient-to-b from-slate-850/60 via-slate-900/40 to-slate-950/50 hover:text-slate-100 hover:from-slate-800/80 hover:to-slate-900/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.25)] hover:scale-[1.01] active:scale-95 cursor-pointer'
+                              : 'text-slate-600 border-t-white border-x-white/80 border-b-slate-200/40 bg-gradient-to-b from-white/95 via-white/85 to-slate-100/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_2px_4px_rgba(0,0,0,0.02)] hover:text-blue-600 hover:from-sky-50 hover:to-blue-100/70 hover:shadow-md hover:border-b-blue-300 hover:shadow-blue-100/30 hover:scale-[1.01] active:scale-95 cursor-pointer'
                         }`}
                       >
                         <span className={`transition-colors duration-300 ${
-                          isPendingTab
-                            ? 'text-slate-400 dark:text-slate-600'
-                            : isActive 
+                          isActive 
                             ? darkMode ? 'text-orange-400' : 'text-orange-600' 
                             : darkMode 
                               ? 'text-slate-500 group-hover:text-slate-100' 
@@ -978,20 +1049,14 @@ export default function App() {
                           {getTabIcon(tab.icon)}
                         </span>
                         <span className="flex-1">{tab.label}</span>
-                        {isPendingTab ? (
-                          <span className="text-[10px] font-medium tracking-tight px-1.5 py-0.5 rounded bg-slate-200/70 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
-                            TBA
+                        {query && tabMatches > 0 && (
+                          <span className={`px-1.5 py-0.5 text-[10px] font-extrabold rounded-full transition-all duration-200 ${
+                            isActive 
+                              ? 'bg-white text-orange-600 font-bold' 
+                              : 'bg-orange-500 text-white'
+                          }`}>
+                            {tabMatches}
                           </span>
-                        ) : (
-                          query && tabMatches > 0 && (
-                            <span className={`px-1.5 py-0.5 text-[10px] font-extrabold rounded-full transition-all duration-200 ${
-                              isActive 
-                                ? 'bg-white text-orange-600 font-bold' 
-                                : 'bg-orange-500 text-white'
-                            }`}>
-                              {tabMatches}
-                            </span>
-                          )
                         )}
                       </button>
                     );
@@ -1975,11 +2040,10 @@ export default function App() {
                         </div>
                         <button
                           type="button"
+                          id="btn-view-grade-scale-quick-link"
                           onClick={() => {
-                            setActiveTab('curriculum-regulations');
-                            setTimeout(() => {
-                              document.getElementById('section-grade-conversion-table')?.scrollIntoView({ behavior: 'smooth' });
-                            }, 100);
+                            if (searchQuery) setSearchQuery('');
+                            navigateToTabAndScroll('curriculum-regulations', 'section-grade-conversion-wrapper');
                           }}
                           className="px-3.5 py-2 rounded-xl text-xs font-bold bg-orange-500 hover:bg-orange-600 text-white transition-all shadow-sm hover:shadow flex items-center gap-2 self-start sm:self-center cursor-pointer whitespace-nowrap"
                         >
@@ -2870,7 +2934,7 @@ export default function App() {
 
                   {/* Part C: German - Vietnamese Grade Conversion Scale (Article 19) */}
                   {(gradeConversionMatches || !query) && (
-                    <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-850" id="section-grade-conversion-wrapper">
+                    <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-850 scroll-mt-28 md:scroll-mt-36" id="section-grade-conversion-wrapper">
                       <div className="flex items-center space-x-2">
                         <Scale className="w-5 h-5 text-orange-500" />
                         <h2 className={`text-base font-extrabold tracking-tight ${
@@ -2905,50 +2969,324 @@ export default function App() {
                 </div>
               )}
 
-              {/* 5. INTERNSHIP & BACHELOR THESIS - Hidden per user request (will be updated later) */}
-              {false && activeTab === 'internship-thesis' && (
+              {/* 5. INTERNSHIP & BACHELOR THESIS - 4 DEDICATED SECTIONS */}
+              {activeTab === 'internship-thesis' && (
                 <div className="space-y-8" id="section-internship-thesis">
-                  {/* Part B: Internship Requirements */}
-                  {(internshipOverviewMatches || filteredInternshipCards.length > 0) && (
-                    <div className="space-y-4">
-                      <div className="flex items-center space-x-2">
-                        <Briefcase className="w-5 h-5 text-orange-500" />
-                        <h2 className={`text-base font-extrabold tracking-tight ${
-                          darkMode ? 'text-slate-200' : 'text-slate-800'
+                  {/* Tab Banner & Section Navigator */}
+                  <div className={`p-6 md:p-8 rounded-2xl border transition-colors ${
+                    darkMode ? 'bg-slate-900/40 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
+                  }`}>
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider rounded-md bg-orange-500/10 text-orange-500 border border-orange-500/20">
+                            Practical & Capstone Roadmap
+                          </span>
+                        </div>
+                        <h1 className={`text-xl md:text-2xl font-extrabold tracking-tight mb-2 ${
+                          darkMode ? 'text-white' : 'text-slate-900'
                         }`}>
-                          Internship Requirements
-                        </h2>
+                          Internship & Bachelor Thesis
+                        </h1>
+                        <p className={`text-xs md:text-sm max-w-3xl leading-relaxed ${
+                          darkMode ? 'text-slate-400' : 'text-slate-600'
+                        }`}>
+                          Essential guidelines, regulatory frameworks, supervisor sign-offs, and downloadable document packages across all 4 key stages: Basic Internship, Industrial Placement, Bachelor's Thesis, and Graduation Checklist.
+                        </p>
                       </div>
 
-                      {internshipOverviewMatches && (
-                        <div className={`p-6 rounded-xl border ${
+                      <div className="flex-shrink-0">
+                        <a
+                          href={DUMMY_DRIVE_URL}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center space-x-2 text-xs font-bold px-4 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white shadow-md shadow-orange-500/20 transition-all hover:scale-105 active:scale-95"
+                          id="internship-thesis-drive-hub"
+                        >
+                          <Inbox className="w-4 h-4" />
+                          <span>Google Drive Master Folder</span>
+                        </a>
+                      </div>
+                    </div>
+
+                    {/* Sub-navigation Section Filter Pills */}
+                    <div className="mt-6 pt-5 border-t border-slate-200/60 dark:border-slate-800/80 flex flex-wrap items-center gap-2">
+                      <span className={`text-[11px] font-bold uppercase tracking-wider mr-1 ${
+                        darkMode ? 'text-slate-400' : 'text-slate-500'
+                      }`}>
+                        Filter Section:
+                      </span>
+                      {[
+                        { id: 'all', label: 'All 4 Sections', count: 4 },
+                        { id: 'basic', label: '1. Basic Internship', sub: '8 Weeks' },
+                        { id: 'industrial', label: '2. Industrial Placement', sub: '12 Weeks' },
+                        { id: 'thesis', label: "3. Bachelor's Thesis", sub: '12 ECTS' },
+                        { id: 'graduation', label: '4. Graduation Checklist', sub: 'Audits' },
+                      ].map((item) => {
+                        const isSelected = internshipSubSection === item.id;
+                        return (
+                          <button
+                            key={item.id}
+                            onClick={() => setInternshipSubSection(item.id as any)}
+                            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200 flex items-center space-x-1.5 cursor-pointer border ${
+                              isSelected
+                                ? darkMode
+                                  ? 'bg-orange-500/20 text-orange-300 border-orange-500/40 shadow-sm'
+                                  : 'bg-orange-50 text-orange-700 border-orange-300 shadow-xs'
+                                : darkMode
+                                  ? 'text-slate-400 border-slate-800 hover:bg-slate-800/60 hover:text-slate-200'
+                                  : 'text-slate-600 border-slate-200 hover:bg-slate-100 hover:text-slate-900'
+                            }`}
+                            id={`internship-filter-pill-${item.id}`}
+                          >
+                            <span>{item.label}</span>
+                            {item.sub && (
+                              <span className={`text-[10px] px-1.5 py-0.2 rounded font-mono ${
+                                isSelected
+                                  ? darkMode ? 'bg-orange-500/30 text-orange-200' : 'bg-orange-200/70 text-orange-800'
+                                  : darkMode ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-500'
+                              }`}>
+                                {item.sub}
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* 1. BASIC INTERNSHIP (8 WEEKS) */}
+                  {(internshipSubSection === 'all' || internshipSubSection === 'basic') && 
+                   basicInternshipMatches && (
+                    <div className="space-y-4" id="section-basic-internship">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div className="flex items-center space-x-2.5">
+                          <div className={`p-2 rounded-lg ${darkMode ? 'bg-amber-500/10 text-amber-400' : 'bg-amber-50 text-amber-600'}`}>
+                            <Wrench className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Part 1</span>
+                              <span className="text-[10px] font-medium px-2 py-0.2 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20">Minimum 8 Weeks</span>
+                              <span className="text-[10px] font-medium px-2 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">Pre-Semester 4</span>
+                            </div>
+                            <h2 className={`text-base md:text-lg font-extrabold tracking-tight ${
+                              darkMode ? 'text-slate-100' : 'text-slate-800'
+                            }`}>
+                              Basic Internship
+                            </h2>
+                          </div>
+                        </div>
+                      </div>
+
+                      {basicInternshipMatches && (
+                        <div className={`p-6 md:p-7 rounded-2xl border transition-all ${
+                          darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
+                        }`} id="basic-internship-email-regulations">
+                          {/* 6 Essential Regulations Grid */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {/* 1. Structure */}
+                            <div className={`p-4 rounded-xl border flex flex-col justify-between ${
+                              darkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50/70 border-slate-200'
+                            }`}>
+                              <div>
+                                <div className="flex items-center justify-between mb-2">
+                                  <span className="text-[11px] font-bold uppercase tracking-wider text-amber-500">1. Structure</span>
+                                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400">3 Mandatory Sections</span>
+                                </div>
+                                <h4 className={`text-xs font-bold mb-2 ${darkMode ? 'text-white' : 'text-slate-800'}`}>
+                                  Three Mandatory Sections
+                                </h4>
+                                <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-300">
+                                  <div className="flex items-center gap-2">
+                                    <Check className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
+                                    <span className="font-semibold">Design</span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <Check className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
+                                    <span className="font-semibold">Mechanical</span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <Check className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
+                                    <span className="font-semibold">Electrical</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* 2. Enrollment & Re-enrollment Policy (English) */}
+                            <div className={`p-4 rounded-xl border flex flex-col justify-between ${
+                              darkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50/70 border-slate-200'
+                            }`}>
+                              <div>
+                                <div className="flex items-center justify-between mb-2">
+                                  <span className="text-[11px] font-bold uppercase tracking-wider text-amber-500">2. Enrollment</span>
+                                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">Sem 1 Auto-Enroll</span>
+                                </div>
+                                <h4 className={`text-xs font-bold mb-1.5 ${darkMode ? 'text-white' : 'text-slate-800'}`}>
+                                  Enrollment & Re-enrollment Policy
+                                </h4>
+                                <div className="space-y-2 text-xs leading-relaxed">
+                                  <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300 text-[11.5px]">
+                                    <strong>Semester 1:</strong> Students are <strong>automatically enrolled</strong> in Semester 1 ➔ <em>No initial registration required</em>.
+                                  </div>
+                                  <p className={`${darkMode ? 'text-slate-300' : 'text-slate-600'} text-xs`}>
+                                    Students <strong>must register for re-enrollment</strong> specifically for any section(s) failed. Passed sections are permanently preserved.
+                                  </p>
+                                  <div className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-800 dark:text-amber-300 text-[11px]">
+                                    ⚠️ <strong>Frequency:</strong> Each section is offered <strong>only once per academic year</strong>.
+                                  </div>
+                                  <ul className={`space-y-1 list-disc list-inside text-[11px] ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                                    <li>Submit the official re-enrollment form when announced.</li>
+                                    <li>Announcements are sent via student email ~1 month prior to the internship.</li>
+                                  </ul>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* 3. Completion Requirements */}
+                            <div className={`p-4 rounded-xl border flex flex-col justify-between ${
+                              darkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50/70 border-slate-200'
+                            }`}>
+                              <div>
+                                <div className="flex items-center justify-between mb-2">
+                                  <span className="text-[11px] font-bold uppercase tracking-wider text-amber-500">3. Completion</span>
+                                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400">HAW Hamburg</span>
+                                </div>
+                                <h4 className={`text-xs font-bold mb-1.5 ${darkMode ? 'text-white' : 'text-slate-800'}`}>
+                                  Completion Requirements
+                                </h4>
+                                <p className={`text-xs leading-relaxed mb-2.5 ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                                  To pass the Basic Internship, students <strong>must pass all three sections</strong>. Once completed, your results will be <strong>officially submitted to HAW Hamburg</strong> as part of the program requirements.
+                                </p>
+                                <div className={`p-2.5 rounded-lg border text-xs leading-relaxed ${
+                                  darkMode ? 'bg-slate-900 border-slate-800 text-slate-300' : 'bg-blue-50/60 border-blue-200/70 text-slate-700'
+                                }`}>
+                                  <span className="font-bold text-blue-600 dark:text-blue-400 block mb-1">
+                                    Independent Section Progression:
+                                  </span>
+                                  <span>
+                                    Failing one or more sections does <em>not</em> block you from taking the other sections.
+                                  </span>
+                                  <span className="block mt-1.5 text-[11px] text-slate-500 dark:text-slate-400 italic">
+                                    💡 <strong>Example:</strong> If a student fails the Design section, they are still eligible to continue and complete the Electrical and Mechanical sections as scheduled.
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* 4. Study Progression & Deadlines */}
+                            <div className={`p-4 rounded-xl border flex flex-col justify-between ${
+                              darkMode ? 'bg-rose-950/20 border-rose-500/30' : 'bg-rose-50/60 border-rose-200'
+                            }`}>
+                              <div>
+                                <div className="flex items-center justify-between mb-2">
+                                  <span className="text-[11px] font-bold uppercase tracking-wider text-rose-500 flex items-center gap-1">
+                                    <AlertTriangle className="w-3.5 h-3.5" />
+                                    4. Deadlines
+                                  </span>
+                                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500/15 text-rose-600 dark:text-rose-400">End of Sem 3</span>
+                                </div>
+                                <p className={`text-xs leading-relaxed ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                                  If you do not pass a section, you may still continue studies in Semester 2 and Semester 3 (Year 2).
+                                </p>
+                                <div className="mt-2 p-2 rounded-lg bg-rose-500/10 border border-rose-500/20 text-[11px] font-medium text-rose-700 dark:text-rose-300">
+                                  <strong>Hard Deadline:</strong> Must be fully completed by the end of Semester 3. Students who fail will <strong>not be allowed to progress to Semester 4 (Year 3)</strong> and must defer studies.
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* 5. Tuition Fee */}
+                            <div className={`p-4 rounded-xl border flex flex-col justify-between ${
+                              darkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50/70 border-slate-200'
+                            }`}>
+                              <div>
+                                <div className="flex items-center justify-between mb-2">
+                                  <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-500">5. Tuition Fee</span>
+                                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">Free Retakes</span>
+                                </div>
+                                <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 mb-2">
+                                  <span className="text-[11px] text-emerald-700 dark:text-emerald-300 block font-semibold">Total Fee for All 3 Sections:</span>
+                                  <span className="text-sm font-extrabold text-emerald-600 dark:text-emerald-400">15,000,000 VND</span>
+                                </div>
+                                <p className={`text-xs leading-relaxed ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                                  <strong>No additional fees</strong> are charged for re-enrolling in failed sections.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* 2. INDUSTRIAL PLACEMENT (12 WEEKS) */}
+                  {(internshipSubSection === 'all' || internshipSubSection === 'industrial') && 
+                   (industrialPlacementMatches || filteredIndustrialPlacementCards.length > 0) && (
+                    <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-850" id="section-industrial-placement">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div className="flex items-center space-x-2.5">
+                          <div className={`p-2 rounded-lg ${darkMode ? 'bg-blue-500/10 text-blue-400' : 'bg-blue-50 text-blue-600'}`}>
+                            <Building2 className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Part 2</span>
+                              <span className="text-[10px] font-medium px-2 py-0.2 rounded bg-blue-500/10 text-blue-500 border border-blue-500/20">Minimum 12 Weeks</span>
+                              <span className="text-[10px] font-medium px-2 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">Year 3 / Year 4</span>
+                            </div>
+                            <h2 className={`text-base md:text-lg font-extrabold tracking-tight ${
+                              darkMode ? 'text-slate-100' : 'text-slate-800'
+                            }`}>
+                              Industrial Placement
+                            </h2>
+                          </div>
+                        </div>
+                      </div>
+
+                      {industrialPlacementMatches && (
+                        <div className={`p-6 rounded-2xl border ${
                           darkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
                         }`}>
-                          <h3 className={`font-bold text-sm mb-3 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                            Basic & Professional Internship
-                          </h3>
+                          <div className="flex items-center gap-2 mb-3">
+                            <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                            <h3 className={`font-bold text-sm ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                              Corporate Engineering Immersion & Automation Placement
+                            </h3>
+                          </div>
                           
-                          <div className="space-y-4 text-xs leading-relaxed">
-                            <div>
-                              <span className="block font-bold text-orange-500 mb-1">1. Basic Internship (Minimum 8 Weeks)</span>
-                              <p className={darkMode ? 'text-slate-300' : 'text-slate-600'}>
-                                Focused on fundamental mechanical operations, metal machining (turning, milling, drilling), basic electrical wiring, PCB fabrication, and technical draftings. Must be completed in registered industrial training workshops or approved mechatronic production lines before entering year 3.
+                          <p className={`text-xs leading-relaxed mb-4 ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                            The Industrial Placement (Professional Internship) represents high-level engineering practice at external enterprises, industrial manufacturing plants, or technology R&D facilities. Students participate in professional project teams solving complex mechatronics challenges.
+                          </p>
+
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className={`p-4 rounded-xl border ${darkMode ? 'bg-slate-950/60 border-slate-800/80' : 'bg-slate-50 border-slate-200/80'}`}>
+                              <span className="text-[11px] font-bold text-blue-500 block mb-1">Duration & Host Criteria</span>
+                              <p className={`text-xs leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                                Minimum <strong className={darkMode ? 'text-slate-200' : 'text-slate-800'}>12 consecutive weeks</strong> at an approved domestic or multinational engineering company with mechatronic, robotics, or automation operations.
                               </p>
                             </div>
 
-                            <div className="pt-3 border-t border-dashed border-slate-800">
-                              <span className="block font-bold text-orange-500 mb-1">2. Professional Internship (Minimum 12 Weeks)</span>
-                              <p className={darkMode ? 'text-slate-300' : 'text-slate-600'}>
-                                An advanced placement centering on systems engineering, factory automation (PLC/SCADA loops), software controls, or mechanical hardware design. Undertaken in reputable multi-national engineering firms or research facilities. Requires a dual sign-off from both VGU coordinator and corporate advisor.
+                            <div className={`p-4 rounded-xl border ${darkMode ? 'bg-slate-950/60 border-slate-800/80' : 'bg-slate-50 border-slate-200/80'}`}>
+                              <span className="text-[11px] font-bold text-blue-500 block mb-1">Dual Supervision Model</span>
+                              <p className={`text-xs leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                                Mentored directly by a Company Field Supervisor at the workplace, with academic progress and topic approval supervised by a designated VGU Faculty Lecturer.
+                              </p>
+                            </div>
+
+                            <div className={`p-4 rounded-xl border ${darkMode ? 'bg-slate-950/60 border-slate-800/80' : 'bg-slate-50 border-slate-200/80'}`}>
+                              <span className="text-[11px] font-bold text-blue-500 block mb-1">Assessment & Sign-off</span>
+                              <p className={`text-xs leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                                Submission of the Comprehensive Technical Placement Report, Company Supervisor Evaluation Slip, and presentation defense if mandated by the academic board.
                               </p>
                             </div>
                           </div>
                         </div>
                       )}
 
-                      {filteredInternshipCards.length > 0 && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5" id="internship-cards-grid">
-                          {filteredInternshipCards.map((card, idx) => (
+                      {filteredIndustrialPlacementCards.length > 0 && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5" id="industrial-placement-cards-grid">
+                          {filteredIndustrialPlacementCards.map((card, idx) => (
                             <PortalCardComponent key={idx} card={card} darkMode={darkMode} />
                           ))}
                         </div>
@@ -2956,62 +3294,88 @@ export default function App() {
                     </div>
                   )}
 
-                  {/* Part A: Bachelor Thesis */}
-                  {(thesisOverviewMatches || filteredThesisCards.length > 0) && (
-                    <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-850">
-                      <div className="flex items-center space-x-2">
-                        <GraduationCap className="w-5 h-5 text-orange-500" />
-                        <h2 className={`text-base font-extrabold tracking-tight ${
-                          darkMode ? 'text-slate-200' : 'text-slate-800'
-                        }`}>
-                          Bachelor Thesis Guidelines
-                        </h2>
+                  {/* 3. BACHELOR'S THESIS (12 ECTS) */}
+                  {(internshipSubSection === 'all' || internshipSubSection === 'thesis') && 
+                   (thesisOverviewMatches || filteredThesisCards.length > 0) && (
+                    <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-850" id="section-bachelor-thesis">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div className="flex items-center space-x-2.5">
+                          <div className={`p-2 rounded-lg ${darkMode ? 'bg-purple-500/10 text-purple-400' : 'bg-purple-50 text-purple-600'}`}>
+                            <GraduationCap className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">Part 3</span>
+                              <span className="text-[10px] font-medium px-2 py-0.2 rounded bg-purple-500/10 text-purple-500 border border-purple-500/20">12 ECTS Capstone</span>
+                              <span className="text-[10px] font-medium px-2 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">Final Year</span>
+                            </div>
+                            <h2 className={`text-base md:text-lg font-extrabold tracking-tight ${
+                              darkMode ? 'text-slate-100' : 'text-slate-800'
+                            }`}>
+                              Bachelor's Thesis
+                            </h2>
+                          </div>
+                        </div>
                       </div>
 
                       {thesisOverviewMatches && (
-                        <div className={`p-6 rounded-xl border ${
+                        <div className={`p-6 rounded-2xl border ${
                           darkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
                         }`}>
-                          <h3 className={`font-bold text-sm mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                            Bachelor Thesis Milestones & Deliverables
-                          </h3>
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="w-2 h-2 rounded-full bg-purple-500"></span>
+                            <h3 className={`font-bold text-sm ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                              Bachelor Thesis Milestones & Research Timeline
+                            </h3>
+                          </div>
+                          
                           <p className={`text-xs leading-relaxed mb-5 ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
-                            The final Bachelor Thesis (12 ECTS) is the capstone engineering achievement. It represents independent research addressing complex mechanical, hardware controller, and embedded software intersections.
+                            The Bachelor Thesis (12 ECTS) is the definitive capstone engineering milestone for the Mechatronics Bachelor program. It demonstrates independent scientific investigation, mathematical modelling, physical prototype development, or software algorithmic execution under the joint supervision of VGU and HAW Hamburg faculty.
                           </p>
 
-                          {/* Timeline Stages */}
+                          {/* 5-Stage Timeline */}
                           <div className="grid grid-cols-1 sm:grid-cols-5 gap-3" id="thesis-timeline">
-                            <div className="p-3 bg-orange-500/5 rounded border border-orange-500/10 text-center">
-                              <span className="block font-mono text-[9px] text-orange-500 font-bold uppercase">Stage 1</span>
+                            <div className={`p-3.5 rounded-xl border text-center ${
+                              darkMode ? 'bg-slate-950/60 border-purple-500/20' : 'bg-purple-50/50 border-purple-100'
+                            }`}>
+                              <span className="block font-mono text-[9px] text-purple-500 font-bold uppercase tracking-wider">Stage 1</span>
                               <span className={`block text-xs font-bold mt-1 ${darkMode ? 'text-white' : 'text-slate-800'}`}>Proposal</span>
-                              <span className="block text-[10px] text-slate-500">Month 1</span>
+                              <span className="block text-[10px] text-slate-500 mt-0.5">Month 1 • Topic Slip</span>
                             </div>
-                            <div className="p-3 bg-orange-500/5 rounded border border-orange-500/10 text-center">
-                              <span className="block font-mono text-[9px] text-orange-500 font-bold uppercase">Stage 2</span>
+                            <div className={`p-3.5 rounded-xl border text-center ${
+                              darkMode ? 'bg-slate-950/60 border-purple-500/20' : 'bg-purple-50/50 border-purple-100'
+                            }`}>
+                              <span className="block font-mono text-[9px] text-purple-500 font-bold uppercase tracking-wider">Stage 2</span>
                               <span className={`block text-xs font-bold mt-1 ${darkMode ? 'text-white' : 'text-slate-800'}`}>Literature</span>
-                              <span className="block text-[10px] text-slate-500">Month 2</span>
+                              <span className="block text-[10px] text-slate-500 mt-0.5">Month 2 • Specs</span>
                             </div>
-                            <div className="p-3 bg-orange-500/5 rounded border border-orange-500/10 text-center">
-                              <span className="block font-mono text-[9px] text-orange-500 font-bold uppercase">Stage 3</span>
+                            <div className={`p-3.5 rounded-xl border text-center ${
+                              darkMode ? 'bg-slate-950/60 border-purple-500/20' : 'bg-purple-50/50 border-purple-100'
+                            }`}>
+                              <span className="block font-mono text-[9px] text-purple-500 font-bold uppercase tracking-wider">Stage 3</span>
                               <span className={`block text-xs font-bold mt-1 ${darkMode ? 'text-white' : 'text-slate-800'}`}>Prototyping</span>
-                              <span className="block text-[10px] text-slate-500">Months 3-4</span>
+                              <span className="block text-[10px] text-slate-500 mt-0.5">Months 3-4 • Lab Tests</span>
                             </div>
-                            <div className="p-3 bg-orange-500/5 rounded border border-orange-500/10 text-center">
-                              <span className="block font-mono text-[9px] text-orange-500 font-bold uppercase">Stage 4</span>
+                            <div className={`p-3.5 rounded-xl border text-center ${
+                              darkMode ? 'bg-slate-950/60 border-purple-500/20' : 'bg-purple-50/50 border-purple-100'
+                            }`}>
+                              <span className="block font-mono text-[9px] text-purple-500 font-bold uppercase tracking-wider">Stage 4</span>
                               <span className={`block text-xs font-bold mt-1 ${darkMode ? 'text-white' : 'text-slate-800'}`}>Draft Writing</span>
-                              <span className="block text-[10px] text-slate-500">Month 5</span>
+                              <span className="block text-[10px] text-slate-500 mt-0.5">Month 5 • Formatting</span>
                             </div>
-                            <div className="p-3 bg-orange-500/5 rounded border border-orange-500/10 text-center">
-                              <span className="block font-mono text-[9px] text-orange-500 font-bold uppercase">Stage 5</span>
+                            <div className={`p-3.5 rounded-xl border text-center ${
+                              darkMode ? 'bg-slate-950/60 border-purple-500/20' : 'bg-purple-50/50 border-purple-100'
+                            }`}>
+                              <span className="block font-mono text-[9px] text-purple-500 font-bold uppercase tracking-wider">Stage 5</span>
                               <span className={`block text-xs font-bold mt-1 ${darkMode ? 'text-white' : 'text-slate-800'}`}>Defense</span>
-                              <span className="block text-[10px] text-slate-500">Month 6</span>
+                              <span className="block text-[10px] text-slate-500 mt-0.5">Month 6 • Colloquium</span>
                             </div>
                           </div>
                         </div>
                       )}
 
                       {filteredThesisCards.length > 0 && (
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-5" id="thesis-cards-grid">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5" id="thesis-cards-grid">
                           {filteredThesisCards.map((card, idx) => (
                             <PortalCardComponent key={idx} card={card} darkMode={darkMode} />
                           ))}
@@ -3020,53 +3384,91 @@ export default function App() {
                     </div>
                   )}
 
-                  {/* Part C: Graduation Audits */}
-                  {(graduationOverviewMatches || filteredGraduationCards.length > 0) && (
-                    <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-850">
-                      <div className="flex items-center space-x-2">
-                        <CheckCircle className="w-5 h-5 text-orange-500" />
-                        <h2 className={`text-base font-extrabold tracking-tight ${
-                          darkMode ? 'text-slate-200' : 'text-slate-800'
-                        }`}>
-                          Graduation Checklists & Audits
-                        </h2>
+                  {/* 4. GRADUATION CHECKLIST */}
+                  {(internshipSubSection === 'all' || internshipSubSection === 'graduation') && 
+                   (graduationOverviewMatches || filteredGraduationCards.length > 0) && (
+                    <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-850" id="section-graduation-checklist">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div className="flex items-center space-x-2.5">
+                          <div className={`p-2 rounded-lg ${darkMode ? 'bg-emerald-500/10 text-emerald-400' : 'bg-emerald-50 text-emerald-600'}`}>
+                            <CheckCircle2 className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Part 4</span>
+                              <span className="text-[10px] font-medium px-2 py-0.2 rounded bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">Degree Clearance</span>
+                              <span className="text-[10px] font-medium px-2 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">210 ECTS Target</span>
+                            </div>
+                            <h2 className={`text-base md:text-lg font-extrabold tracking-tight ${
+                              darkMode ? 'text-slate-100' : 'text-slate-800'
+                            }`}>
+                              Graduation Checklist
+                            </h2>
+                          </div>
+                        </div>
                       </div>
 
                       {graduationOverviewMatches && (
-                        <div className={`p-6 rounded-xl border ${
+                        <div className={`p-6 rounded-2xl border ${
                           darkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
                         }`}>
-                          <h3 className={`font-bold text-sm mb-3 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                            Final Graduation Academic Audits
-                          </h3>
+                          <div className="flex items-center gap-2 mb-3">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            <h3 className={`font-bold text-sm ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                              Final Graduation Audits & Degree Clearance Protocols
+                            </h3>
+                          </div>
+
                           <p className={`text-xs leading-relaxed mb-4 ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
-                            Students are advised to initiate the academic clearance audit during Year 4 Semester 2. All credits including basic studies, professional internship, and the Bachelor Thesis must be fully computed on SIS grade sheets.
+                            Students approaching graduation must verify all curricular requirements on the Student Information System (SIS) during Year 4 Semester 2. Clearance covers academic credits, English qualifications, practical modules, thesis defense, and administrative settlements.
                           </p>
-                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            <div className={`p-3 rounded-lg border flex items-center gap-2.5 ${
-                              darkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                            <div className={`p-3.5 rounded-xl border flex items-start gap-2.5 ${
+                              darkMode ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-200'
                             }`}>
-                              <Check className="w-4 h-4 text-orange-500 flex-shrink-0" />
-                              <span className="text-xs">Satisfy 210 ECTS Credit Target</span>
+                              <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                              <div>
+                                <span className="text-xs font-bold block mb-0.5">210 ECTS Credits</span>
+                                <span className="text-[11px] text-slate-500">All mandatory & elective modules passed</span>
+                              </div>
                             </div>
-                            <div className={`p-3 rounded-lg border flex items-center gap-2.5 ${
-                              darkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'
+
+                            <div className={`p-3.5 rounded-xl border flex items-start gap-2.5 ${
+                              darkMode ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-200'
                             }`}>
-                              <Check className="w-4 h-4 text-orange-500 flex-shrink-0" />
-                              <span className="text-xs">IELTS 6.0 English Proficiency level</span>
+                              <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                              <div>
+                                <span className="text-xs font-bold block mb-0.5">English Proficiency</span>
+                                <span className="text-[11px] text-slate-500">IELTS ≥ 6.0 certified at ASA</span>
+                              </div>
                             </div>
-                            <div className={`p-3 rounded-lg border flex items-center gap-2.5 ${
-                              darkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'
+
+                            <div className={`p-3.5 rounded-xl border flex items-start gap-2.5 ${
+                              darkMode ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-200'
                             }`}>
-                              <Check className="w-4 h-4 text-orange-500 flex-shrink-0" />
-                              <span className="text-xs">Complete both Internship stages</span>
+                              <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                              <div>
+                                <span className="text-xs font-bold block mb-0.5">Both Internships</span>
+                                <span className="text-[11px] text-slate-500">Basic (8w) + Industrial (12w) accredited</span>
+                              </div>
+                            </div>
+
+                            <div className={`p-3.5 rounded-xl border flex items-start gap-2.5 ${
+                              darkMode ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-200'
+                            }`}>
+                              <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                              <div>
+                                <span className="text-xs font-bold block mb-0.5">Thesis Defense</span>
+                                <span className="text-[11px] text-slate-500">Grade ≤ 4.0 on German scale</span>
+                              </div>
                             </div>
                           </div>
                         </div>
                       )}
 
                       {filteredGraduationCards.length > 0 && (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-5" id="graduation-cards-grid">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" id="graduation-cards-grid">
                           {filteredGraduationCards.map((card, idx) => (
                             <PortalCardComponent key={idx} card={card} darkMode={darkMode} />
                           ))}
@@ -3077,8 +3479,8 @@ export default function App() {
                 </div>
               )}
 
-              {/* 6. SCHOLARSHIP & EXCHANGE - Hidden per user request (will be updated later) */}
-              {false && activeTab === 'scholarship-exchange' && (
+              {/* 6. SCHOLARSHIP & EXCHANGE */}
+              {activeTab === 'scholarship-exchange' && (
                 <div className="space-y-8" id="section-scholarship-exchange">
                   {/* Part A: Scholarships */}
                   {filteredScholarshipCards.length > 0 && (

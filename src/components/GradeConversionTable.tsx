@@ -109,7 +109,7 @@ export default function GradeConversionTable({ darkMode, searchQuery = '' }: Gra
 
   return (
     <div 
-      className={`rounded-2xl border transition-all duration-300 overflow-hidden ${
+      className={`rounded-2xl border transition-all duration-300 overflow-hidden scroll-mt-28 md:scroll-mt-36 ${
         darkMode 
           ? 'bg-slate-900/50 border-slate-800 shadow-xl backdrop-blur-md' 
           : 'bg-white border-slate-200 shadow-md'

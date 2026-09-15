@@ -169,31 +169,63 @@ export const FORM_CARDS: PortalCard[] = [
   }
 ];
 
-export const INTERNSHIP_CARDS: PortalCard[] = [
+export const BASIC_INTERNSHIP_CARDS: PortalCard[] = [
   {
-    title: "Basic Internship Guidelines",
-    description: "Official policy on early-stage manufacturing skills training, requirements, duration (8 weeks), and reporting.",
-    type: "DRIVE",
+    title: "HAW Hamburg - Basic Internship Regulations (Vorpraxis Richtlinie)",
+    description: "HAW_Mechatronik_Vorpraxis_Richtlinie en-GB.pdf: Official German regulations detailing the 3 mandatory sections (Design, Mechanical, Electrical) and accreditation standards.",
+    type: "PDF",
     url: DUMMY_DRIVE_URL
   },
   {
-    title: "Report Cover Template",
-    description: "Standardized Microsoft Word template for your final internship portfolio, containing signature fields.",
+    title: "VGU Official Notice: Basic Internship Regulations",
+    description: "Official circular from Ms. Yen Tran (Faculty of Engineering) on completion rules, hard deadline (end of Semester 3), 15,000,000 VND tuition fee, and re-enrollment policy.",
+    type: "DOCX",
+    url: DUMMY_DRIVE_URL
+  },
+  {
+    title: "Basic Internship Re-enrollment Registration Form",
+    description: "Mandatory form for students needing to re-enroll in failed sections (Design, Mechanical, or Electrical). Free of charge; offered once per academic year.",
+    type: "FORM",
+    url: DUMMY_FORM_URL
+  },
+  {
+    title: "Basic Internship Weekly Logbook & Report Template",
+    description: "Official portfolio template for documenting workshop operations across all 3 sections with company/instructor evaluation slips.",
+    type: "DOCX",
+    url: DUMMY_DRIVE_URL
+  }
+];
+
+export const INDUSTRIAL_PLACEMENT_CARDS: PortalCard[] = [
+  {
+    title: "Industrial Placement Regulations",
+    description: "Advanced engineering criteria, systems automation placement rules, duration (minimum 12 weeks), and defense requirements.",
     type: "DRIVE",
     url: DUMMY_DRIVE_URL
   },
   {
     title: "Industrial Placement Authorization Letter",
-    description: "Request an official introductory letter signed by VGU to present to external host corporations.",
+    description: "Request an official introductory recommendation letter signed by VGU to present to external corporate hosts.",
     type: "DRIVE",
     url: DUMMY_DRIVE_URL
   },
   {
-    title: "Professional Internship Regulations",
-    description: "Advanced engineering experience criteria, supervisor logs, and presentation evaluation rules.",
+    title: "Enterprise Supervisor Evaluation Form",
+    description: "Confidential evaluation rubric and appraisal slip completed by the company industrial mentor upon placement completion.",
+    type: "DRIVE",
+    url: DUMMY_DRIVE_URL
+  },
+  {
+    title: "Industrial Placement Final Technical Report Template",
+    description: "Standard engineering report template covering system architectures, PLC/SCADA loops, and mechatronic design outcomes.",
     type: "DRIVE",
     url: DUMMY_DRIVE_URL
   }
+];
+
+export const INTERNSHIP_CARDS: PortalCard[] = [
+  ...BASIC_INTERNSHIP_CARDS,
+  ...INDUSTRIAL_PLACEMENT_CARDS
 ];
 
 export const SCHOLARSHIP_CARDS: PortalCard[] = [
