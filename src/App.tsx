@@ -56,6 +56,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import PortalCardComponent from './components/PortalCardComponent';
 import GradeConversionTable from './components/GradeConversionTable';
+import MecRegulationsOfficial from './components/MecRegulationsOfficial';
 import { TbaTabSection } from './components/TbaTabSection';
 
 const INTERNSHIP_UPCOMING_ITEMS = [
@@ -161,28 +162,35 @@ const SEARCH_POOL: SearchItem[] = [
     title: 'Evaluation of Examinations - German & Vietnamese Grade Conversion Scale',
     description: 'Official linear calibration between German grading scale (1.0 - 5.0) and Vietnamese 10-point scale based on academic achievement %',
     type: 'LINK' as const,
-    category: 'Curriculum & Regulations',
+    category: 'Academic Regulations',
     url: '#section-grade-conversion-table'
   },
   {
     title: 'German - Vietnamese Grade Conversion Scale (Article 19)',
     description: 'Official linear calibration between German grading scale (1.0 - 5.0) and Vietnamese 10-point scale',
     type: 'LINK' as const,
-    category: 'Curriculum & Regulations',
+    category: 'Academic Regulations',
     url: '#section-grade-conversion-table'
   },
   {
-    title: 'Retake Exam Regulations',
-    description: 'No retakes for passed modules, maximum 2 retakes (3 total attempts), conclusively unsuccessful dismissal, and cumulative failed attempts tracking',
+    title: 'HAW Hamburg & VGU Examination and Study Regulations (B.Sc. Mechatronics)',
+    description: 'Official 2026 regulations governing 210 ECTS, 3.5-year duration, course attendance ≥80%, 3-day withdrawal, 4-attempt retake limit, 180 ECTS thesis, and degree calculation (80% modules + 20% thesis)',
     type: 'LINK' as const,
-    category: 'Curriculum & Regulations',
+    category: 'Academic Regulations',
+    url: '#official-regulations-container'
+  },
+  {
+    title: 'Retake Exam Regulations (§ 20 & § 27)',
+    description: 'No retakes for passed modules, maximum 3 retakes (4 total attempts), conclusively unsuccessful dismissal, and cumulative failed attempts tracking',
+    type: 'LINK' as const,
+    category: 'Academic Regulations',
     url: '#section-retake-exams-regulations'
   },
   {
     title: 'Oral Supplementary Examination',
     description: 'Grade rescue opportunity for failed written or take-home exams (5.0 to 4.0), max 1/module & 3/degree, written application within 4 weeks',
     type: 'LINK' as const,
-    category: 'Curriculum & Regulations',
+    category: 'Academic Regulations',
     url: '#section-oral-assessment-regulations'
   },
   ...FORM_CARDS.map(c => ({ ...c, category: 'Forms & Petitions' as string })),
@@ -330,12 +338,15 @@ export default function App() {
     if (item.category === 'Forms & Petitions') targetTab = 'forms';
     else if (item.category === 'Exam Administrative Forms') targetTab = 'schedules-exams';
     else if (item.category === 'Schedules' || item.category === 'Previous Schedules Archive') targetTab = 'schedules-exams';
+    else if (item.category === 'Curriculum & Handbooks' || item.category === 'Curriculum') {
+      targetTab = 'curriculum';
+    }
     else if (
-      item.category === 'Curriculum & Handbooks' || 
       item.category === 'Academic Regulations' || 
+      item.category === 'Regulations' || 
       item.category === 'Curriculum & Regulations'
     ) {
-      targetTab = 'curriculum-regulations';
+      targetTab = 'regulations';
     }
     else if (
       item.category === 'Basic Internship' || 
@@ -588,12 +599,20 @@ export default function App() {
 
   const examPrereqMatches = !query ||
     "Prerequisites for taking final exams".toLowerCase().includes(query) ||
+    "attendance compulsory seminar laboratory practical tutorial 80%".toLowerCase().includes(query) ||
+    "pass lab requirements assignments".toLowerCase().includes(query) ||
+    "chuyên cần 80% thực hành thí nghiệm seminar bài tập".toLowerCase().includes(query) ||
     "In order to qualify for the final examinations under the joint MEC regulatory code: Students must satisfy the mandatory lecture attendance rate of at least 80%. Laboratory attendance is strictly mandatory at 100%—all practical blocks must be fully passed. Satisfactory grades must be obtained on all homework, midterms, or project reports.".toLowerCase().includes(query);
 
   const examRulesMatches = !query ||
+    "section a: final exam registration".includes(query) ||
+    "final exam registration".includes(query) ||
     "a. retake exam registration".includes(query) ||
     "b. step-back from a final exam".includes(query) ||
+    "b. retake exam registration".includes(query) ||
+    "participation in an examination requires students to register for it".includes(query) ||
     "retake exam registration deadline 7 days teaching plan failed stepped back banned attendance 5.0".includes(query) ||
+    "to-do list check eligibility not eligible cancel registration".includes(query) ||
     "step-back from a final exam tentative final exam list stepping back attendance compulsory".includes(query) ||
     "thi lai thi lại step back rut mon huy thi hoan thi".includes(query);
 
@@ -612,11 +631,25 @@ export default function App() {
     "semester 4 progression".toLowerCase().includes(query) ||
     "VGU ASA by 15.08".toLowerCase().includes(query);
 
+  const officialRegulationsMatches = !query ||
+    "examination and study regulations for the bachelor's degree programme in mechatronics b.sc. haw hamburg vgu".toLowerCase().includes(query) ||
+    "quy chế đào tạo và thi cử mechatronics".toLowerCase().includes(query) ||
+    "attendance compulsory 80% chuyên cần".toLowerCase().includes(query) ||
+    "withdrawal deadline 3 calendar days hủy thi rút thi".toLowerCase().includes(query) ||
+    "bachelor thesis 180 ects khóa luận tốt nghiệp bảo vệ colloquium".toLowerCase().includes(query) ||
+    "practical module main placement 14 weeks thực tập chính".toLowerCase().includes(query) ||
+    "gatekeeper 3rd year m1 m12 50 ects tiền điều kiện".toLowerCase().includes(query) ||
+    "academic advising tư vấn học tập exmatriculation thôi học".toLowerCase().includes(query) ||
+    "grading scale 1.0 4.0 5.0 thang điểm đức".toLowerCase().includes(query) ||
+    "overall mark 80% 20% điểm tốt nghiệp xếp loại".toLowerCase().includes(query) ||
+    "appeals inspection of records khiếu nại phúc khảo".toLowerCase().includes(query) ||
+    "online examinations written exams prohibited thi online".toLowerCase().includes(query);
+
   const retakeRegulationsMatches = !query ||
     "quy định về thi lại (retake exams)".toLowerCase().includes(query) ||
     "retake exam regulations wiederholungsprüfungen".toLowerCase().includes(query) ||
     "no retakes for passed modules".toLowerCase().includes(query) ||
-    "maximum number of retakes max 2 retakes".toLowerCase().includes(query) ||
+    "maximum number of retakes max 3 retakes 4 attempts".toLowerCase().includes(query) ||
     "conclusively unsuccessful endgültig nicht bestanden".toLowerCase().includes(query) ||
     "cumulative tracking of failed attempts".toLowerCase().includes(query) ||
     "oral supplementary examination mündliche ergänzungsprüfung".toLowerCase().includes(query) ||
@@ -626,7 +659,7 @@ export default function App() {
     "written application deadline 4 weeks".toLowerCase().includes(query) ||
     "exclusion criteria academic misconduct cheating disruption".toLowerCase().includes(query) ||
     "thi lại retake không thi lại môn đã đỗ".toLowerCase().includes(query) ||
-    "số lần thi lại tối đa 2 lần tổng cộng 3 cơ hội".toLowerCase().includes(query) ||
+    "số lần thi lại tối đa 3 lần tổng cộng 4 cơ hội".toLowerCase().includes(query) ||
     "đánh giá trượt vĩnh viễn conclusively unsuccessful endgültig không đạt".toLowerCase().includes(query) ||
     "tính gộp số lần trượt haw hamburg".toLowerCase().includes(query) ||
     "vấn đáp bổ sung cứu điểm trượt oral assessment mündliche ergänzungsprüfung".toLowerCase().includes(query) ||
@@ -709,8 +742,11 @@ export default function App() {
     ? (filteredInfoChannels.length + filteredScheduleCards.length + filteredExamCards.length + filteredCurriculumCards.length + 
        filteredRegulationCards.length + filteredFormCards.length + filteredThesisCards.length + 
        filteredIndustrialPlacementCards.length + filteredGraduationCards.length + filteredScholarshipCards.length + 
-       filteredExchangeCards.length + filteredFaqItems.length + (scholarshipOverviewMatches ? 1 : 0) + 
-       (gradeConversionMatches ? 1 : 0) + (basicInternshipMatches ? 1 : 0) + (industrialPlacementMatches ? 1 : 0))
+       filteredExchangeCards.length + filteredFaqItems.length + (curriculumOverviewMatches ? 1 : 0) +
+       (officialRegulationsMatches ? 1 : 0) +
+       (foundationTransitionMatches ? 1 : 0) + (retakeRegulationsMatches ? 1 : 0) +
+       (scholarshipOverviewMatches ? 1 : 0) + (gradeConversionMatches ? 1 : 0) + 
+       (basicInternshipMatches ? 1 : 0) + (industrialPlacementMatches ? 1 : 0))
     : 0;
 
   const getTabMatchesCount = (tabId: string) => {
@@ -720,8 +756,10 @@ export default function App() {
         return filteredInfoChannels.length;
       case 'schedules-exams':
         return filteredScheduleCards.length + filteredExamCards.length;
-      case 'curriculum-regulations':
-        return filteredCurriculumCards.length + filteredRegulationCards.length + (gradeConversionMatches ? 1 : 0) + (retakeRegulationsMatches ? 1 : 0);
+      case 'curriculum':
+        return filteredCurriculumCards.length + (curriculumOverviewMatches ? 1 : 0);
+      case 'regulations':
+        return filteredRegulationCards.length + (officialRegulationsMatches ? 1 : 0) + (foundationTransitionMatches ? 1 : 0) + (retakeRegulationsMatches ? 1 : 0) + (gradeConversionMatches ? 1 : 0);
       case 'forms':
         return filteredFormCards.length;
       case 'internship-thesis':
@@ -1754,34 +1792,304 @@ export default function App() {
                         </div>
                       </div>
 
+                      {/* Examination Portal Cards */}
+                      {filteredExamCards.length > 0 && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5" id="exam-cards-grid">
+                          {filteredExamCards.map((card, idx) => (
+                            <PortalCardComponent key={idx} card={card} darkMode={darkMode} />
+                          ))}
+                        </div>
+                      )}
+
                       {/* General Prerequisites Warning Box */}
                       {examPrereqMatches && (
-                        <div className={`p-6 rounded-xl border ${
+                        <div className={`p-5 sm:p-6 rounded-xl border ${
                           darkMode ? 'bg-amber-500/5 border-amber-500/15 text-slate-300' : 'bg-amber-50/50 border-amber-200 text-slate-700'
                         }`}>
                           <div className="flex items-start gap-3">
                             <AlertCircle className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" />
-                            <div>
-                              <h3 className={`font-bold text-sm mb-1.5 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                                Prerequisites for taking final exams
-                              </h3>
-                              <p className="text-xs leading-relaxed space-y-1.5">
-                                In order to qualify for the final examinations under the joint MEC regulatory code:
+                            <div className="space-y-2">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <h3 className={`font-bold text-sm ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                                  Prerequisites for Final Examination Admission
+                                </h3>
+                              </div>
+                              <p className="text-xs leading-relaxed">
+                                To qualify for final examinations under the official MEC study regulations:
                               </p>
-                              <ul className="list-disc pl-5 mt-2 space-y-1 text-xs">
-                                <li>Students must satisfy the mandatory lecture attendance rate of at least 80%.</li>
-                                <li>Laboratory attendance is strictly mandatory at 100%—all practical blocks must be fully passed.</li>
-                                <li>Satisfactory grades must be obtained on all homework, midterms, or project reports.</li>
+                              <ul className="list-disc pl-4 space-y-1.5 text-xs">
+                                <li>
+                                  <strong>Compulsory Attendance (&ge; 80%):</strong> Attendance is strictly mandatory for <strong>Seminar</strong>, <strong>Laboratory practical</strong>, and <strong>Tutorial</strong>. Students must attend at least <strong>80% of the weekly semester hours</strong> specified for the course.
+                                </li>
+                                <li>
+                                  <strong>Pass Lab Requirements:</strong> Students must successfully complete and pass all required <strong>laboratory practical assignments and experiments</strong> to be admitted to the final exam.
+                                </li>
                               </ul>
                             </div>
                           </div>
                         </div>
                       )}
 
-                      {/* Detailed Guidelines: A. Retake Exam Registration & B. Step-Back from a Final Exam */}
+                      {/* Detailed Guidelines: A. Registration for a Final Exam & B. Retake Exam Registration */}
                       {examRulesMatches && (
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5" id="exam-guidelines-row">
-                          {/* Card A: RETAKE EXAM REGISTRATION */}
+                          {/* Card A: REGISTRATION FOR A FINAL EXAM */}
+                          <div 
+                            id="card-stepback-final-exam"
+                            className={`rounded-2xl border transition-all duration-200 overflow-hidden flex flex-col justify-between ${
+                              darkMode 
+                                ? 'bg-slate-900/60 border-slate-800 backdrop-blur-sm shadow-sm' 
+                                : 'bg-white border-slate-200/90 shadow-xs'
+                            }`}
+                          >
+                            <div>
+                              {/* Header & Toggle Bar */}
+                              <div className={`p-4 sm:p-5 flex items-center justify-between border-b ${
+                                darkMode ? 'border-slate-800 bg-slate-900/40' : 'border-slate-100 bg-slate-50/60'
+                              }`}>
+                                <div className="flex items-center gap-3">
+                                  <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center flex-shrink-0">
+                                    <ShieldAlert className="w-4 h-4" />
+                                  </div>
+                                  <div>
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                                        Section A
+                                      </span>
+                                    </div>
+                                    <h3 className={`text-sm sm:text-base font-bold tracking-tight ${
+                                      darkMode ? 'text-white' : 'text-slate-900'
+                                    }`}>
+                                      Final Exam Registration
+                                    </h3>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <a
+                                    href="https://forms.gle/CkecUGbfnLmz5E5u6"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    id="stepback-register-link-btn"
+                                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-xs"
+                                  >
+                                    <span>Register Exam</span>
+                                    <ArrowUpRight className="w-3.5 h-3.5" />
+                                  </a>
+                                  <button
+                                    type="button"
+                                    onClick={() => setIsStepBackRulesExpanded(prev => !prev)}
+                                    className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                                      darkMode ? 'hover:bg-slate-800 text-slate-400 hover:text-white' : 'hover:bg-slate-100 text-slate-500 hover:text-slate-900'
+                                    }`}
+                                    aria-label="Toggle Registration Rules"
+                                  >
+                                    <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${
+                                      (isStepBackRulesExpanded || query.trim().length > 0) ? 'rotate-180' : ''
+                                    }`} />
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* Card Body */}
+                              {(isStepBackRulesExpanded || query.trim().length > 0) && (
+                                <div className="p-5 space-y-4">
+                                  {/* Mandatory Registration Notice */}
+                                  <div className={`p-3.5 rounded-xl border flex items-start gap-3 ${
+                                    darkMode ? 'bg-blue-500/10 border-blue-500/25 text-slate-200' : 'bg-blue-50/80 border-blue-200/90 text-slate-800'
+                                  }`}>
+                                    <div className="p-1 rounded-md bg-blue-500/15 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5">
+                                      <AlertTriangle className="w-4 h-4" />
+                                    </div>
+                                    <div className="text-xs leading-relaxed">
+                                      <span className={`font-semibold block mb-0.5 ${darkMode ? 'text-blue-300' : 'text-blue-900'}`}>
+                                        Mandatory Registration Requirement
+                                      </span>
+                                      <p className={darkMode ? 'text-slate-300' : 'text-slate-600'}>
+                                        Registration is <strong>compulsory</strong> to sit for the final examination. Unregistered students will <strong>not appear on the official examination list</strong>.
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  {/* To-Do List / Student Action Checklist */}
+                                  <div className="space-y-3">
+                                    <div className={`p-2.5 rounded-xl border flex items-center justify-between gap-2 ${
+                                      darkMode 
+                                        ? 'bg-blue-500/10 border-blue-500/30' 
+                                        : 'bg-blue-50/80 border-blue-200'
+                                    }`}>
+                                      <div className="flex items-center gap-2.5">
+                                        <div className="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center shadow-xs flex-shrink-0">
+                                          <ClipboardList className="w-3.5 h-3.5" />
+                                        </div>
+                                        <div>
+                                          <div className={`text-xs font-bold uppercase tracking-wider ${
+                                            darkMode ? 'text-blue-300' : 'text-blue-900'
+                                          }`}>
+                                            Student Action Checklist (What You Must Do)
+                                          </div>
+                                          <div className={`text-[10.5px] ${
+                                            darkMode ? 'text-blue-200/70' : 'text-blue-700/80'
+                                          }`}>
+                                            Mandatory tasks required from students before the deadline
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full flex-shrink-0 ${
+                                        darkMode ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' : 'bg-white text-blue-800 border border-blue-200 shadow-2xs'
+                                      }`}>
+                                        2 Steps
+                                      </span>
+                                    </div>
+
+                                    {/* Step 1 */}
+                                    <div className={`p-3.5 rounded-xl border border-l-4 border-l-blue-600 flex items-start gap-3 transition-all ${
+                                      darkMode ? 'bg-slate-800/30 border-slate-700/60' : 'bg-slate-50/80 border-slate-200/80'
+                                    }`}>
+                                      <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5 shadow-xs">
+                                        1
+                                      </div>
+                                      <div className="text-xs leading-relaxed flex-1">
+                                        <div className="flex items-center gap-2 mb-1">
+                                          <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-blue-600/15 text-blue-700 dark:text-blue-300">
+                                            Step 1
+                                          </span>
+                                          <span className={`font-semibold ${darkMode ? 'text-slate-100' : 'text-slate-900'}`}>
+                                            Check final exam schedule
+                                          </span>
+                                        </div>
+                                        <p className={darkMode ? 'text-slate-300' : 'text-slate-600'}>
+                                          Review the final exam schedule in the{' '}
+                                          <a 
+                                            href="https://docs.google.com/spreadsheets/d/1Dj9MiKupgDBFr8GGaJIKbt6GlPgVcQELVLam8EGl0cM/edit?gid=218939538#gid=218939538" 
+                                            target="_blank" 
+                                            rel="noopener noreferrer"
+                                            className="font-medium text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-0.5"
+                                          >
+                                            <span>MEC - Teaching Plan - AY2026-2027</span>
+                                            <ArrowUpRight className="w-3 h-3" />
+                                          </a>.
+                                        </p>
+                                      </div>
+                                    </div>
+
+                                    {/* Step 2 */}
+                                    <div className={`p-3.5 rounded-xl border border-l-4 border-l-blue-600 flex items-start gap-3 transition-all ${
+                                      darkMode ? 'bg-slate-800/30 border-slate-700/60' : 'bg-slate-50/80 border-slate-200/80'
+                                    }`}>
+                                      <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5 shadow-xs">
+                                        2
+                                      </div>
+                                      <div className="text-xs leading-relaxed flex-1 space-y-1.5">
+                                        <div className="flex items-center gap-2 mb-1">
+                                          <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-blue-600/15 text-blue-700 dark:text-blue-300">
+                                            Step 2
+                                          </span>
+                                          <span className={`font-semibold ${darkMode ? 'text-slate-100' : 'text-slate-900'}`}>
+                                            Fill in the Exam Registration Form
+                                          </span>
+                                        </div>
+                                        <p className={darkMode ? 'text-slate-300' : 'text-slate-600'}>
+                                          Submit your registration via{' '}
+                                          <a 
+                                            href="https://forms.gle/CkecUGbfnLmz5E5u6" 
+                                            target="_blank" 
+                                            rel="noopener noreferrer"
+                                            className="font-semibold text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-0.5"
+                                          >
+                                            <span>the official Exam Registration Form</span>
+                                            <ArrowUpRight className="w-3 h-3" />
+                                          </a>.
+                                        </p>
+                                        <div className={`p-2.5 rounded-lg text-[11.5px] leading-normal flex items-center gap-2 ${
+                                          darkMode ? 'bg-slate-800/60 text-slate-300 border border-slate-700/60' : 'bg-slate-100/90 text-slate-700 border border-slate-200/70'
+                                        }`}>
+                                          <Info className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
+                                          <span>
+                                            You can come back to the form to <strong>cancel or update</strong> the registration anytime before the deadline.
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  {/* Section Divider */}
+                                  <div className="pt-1 flex items-center gap-2">
+                                    <div className={`h-px flex-1 ${darkMode ? 'bg-slate-800' : 'bg-slate-200'}`} />
+                                    <span className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                                      Deadlines & Department Review
+                                    </span>
+                                    <div className={`h-px flex-1 ${darkMode ? 'bg-slate-800' : 'bg-slate-200'}`} />
+                                  </div>
+
+                                  {/* Strict Deadline Notice */}
+                                  <div className={`p-3.5 rounded-xl border flex items-start gap-3 ${
+                                    darkMode ? 'bg-amber-500/5 border-amber-500/20 text-slate-300' : 'bg-amber-50/60 border-amber-200/80 text-slate-700'
+                                  }`}>
+                                    <div className="p-1 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5">
+                                      <Clock className="w-4 h-4" />
+                                    </div>
+                                    <div className="text-xs leading-relaxed">
+                                      <div className={`font-semibold mb-0.5 ${darkMode ? 'text-amber-300' : 'text-amber-900'}`}>
+                                        Strict Deadline: 7 Days Prior to Exam Date
+                                      </div>
+                                      <p className={darkMode ? 'text-slate-300' : 'text-slate-600'}>
+                                        The registration form will be <strong>strictly closed 7 calendar days</strong> before the final exam date. Late requests are rejected.
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  {/* MEC Prerequisites Verification Notice */}
+                                  <div className={`p-3.5 rounded-xl border flex items-start gap-3 ${
+                                    darkMode ? 'bg-slate-800/30 border-slate-700/60' : 'bg-slate-50/80 border-slate-200/80'
+                                  }`}>
+                                    <div className="p-1 rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5">
+                                      <CheckCircle2 className="w-4 h-4" />
+                                    </div>
+                                    <div className="text-xs leading-relaxed">
+                                      <span className={`font-semibold block mb-0.5 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
+                                        Prerequisites Verification by MEC Program
+                                      </span>
+                                      <p className={darkMode ? 'text-slate-300' : 'text-slate-600'}>
+                                        The MEC Program will then check and verify all prerequisites for final examinations (e.g., compulsory 80% attendance in Seminars, Labs, Tutorials, and fully passed practical lab assignments) before finalizing the official exam list.
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  {/* Compulsory Attendance Notice */}
+                                  <div className={`p-3.5 rounded-xl border flex items-start gap-3 ${
+                                    darkMode ? 'bg-slate-800/40 border-slate-700/80' : 'bg-slate-50 border-slate-200'
+                                  }`}>
+                                    <div className="p-1 rounded-md bg-orange-500/10 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5">
+                                      <AlertTriangle className="w-4 h-4" />
+                                    </div>
+                                    <div className="text-xs leading-relaxed">
+                                      <span className={`font-semibold block mb-0.5 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
+                                        Compulsory Attendance on Finalized Exam List
+                                      </span>
+                                      <span className={darkMode ? 'text-slate-400' : 'text-slate-600'}>
+                                        Once the official exam roster is finalized, examination attendance is mandatory. Unexcused absence will result in a <strong className="text-rose-600 dark:text-rose-400 font-semibold">Failed Grade (5.0)</strong> and counts as an examination attempt.
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Mobile action button */}
+                            <div className="p-3 sm:hidden border-t border-slate-100 dark:border-slate-800/60">
+                              <a
+                                href="https://forms.gle/CkecUGbfnLmz5E5u6"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-blue-600 text-white"
+                              >
+                                <span>Register Final Exam</span>
+                                <ArrowUpRight className="w-3.5 h-3.5" />
+                              </a>
+                            </div>
+                          </div>
+
+                          {/* Card B: RETAKE EXAM REGISTRATION */}
                           <div 
                             id="card-retake-exam-registration"
                             className={`rounded-2xl border transition-all duration-200 overflow-hidden flex flex-col justify-between ${
@@ -1802,11 +2110,7 @@ export default function App() {
                                   <div>
                                     <div className="flex items-center gap-2">
                                       <span className="text-[10px] font-bold uppercase tracking-wider text-orange-600 dark:text-orange-400">
-                                        Section A
-                                      </span>
-                                      <span className="text-slate-300 dark:text-slate-700">•</span>
-                                      <span className={`text-[11px] font-medium ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                                        Retake Regulations
+                                        Section B
                                       </span>
                                     </div>
                                     <h3 className={`text-sm sm:text-base font-bold tracking-tight ${
@@ -1845,7 +2149,190 @@ export default function App() {
                               {/* Card Body */}
                               {(isRetakeRulesExpanded || query.trim().length > 0) && (
                                 <div className="p-5 space-y-4">
-                                  {/* Deadline Notice */}
+                                  {/* Mandatory Registration Notice */}
+                                  <div className={`p-3.5 rounded-xl border flex items-start gap-3 ${
+                                    darkMode ? 'bg-orange-500/10 border-orange-500/25 text-slate-200' : 'bg-orange-50/80 border-orange-200/90 text-slate-800'
+                                  }`}>
+                                    <div className="p-1 rounded-md bg-orange-500/15 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5">
+                                      <AlertTriangle className="w-4 h-4" />
+                                    </div>
+                                    <div className="text-xs leading-relaxed">
+                                      <span className={`font-semibold block mb-0.5 ${darkMode ? 'text-orange-300' : 'text-orange-900'}`}>
+                                        Mandatory Registration Requirement
+                                      </span>
+                                      <p className={darkMode ? 'text-slate-300' : 'text-slate-600'}>
+                                        Registration is <strong>compulsory</strong> to sit for the retake exam. Unregistered students will <strong>not appear on the official examination list</strong>.
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  {/* To-Do List / Student Action Checklist */}
+                                  <div className="space-y-3">
+                                    <div className={`p-2.5 rounded-xl border flex items-center justify-between gap-2 ${
+                                      darkMode 
+                                        ? 'bg-orange-500/10 border-orange-500/30' 
+                                        : 'bg-orange-50/80 border-orange-200'
+                                    }`}>
+                                      <div className="flex items-center gap-2.5">
+                                        <div className="w-6 h-6 rounded-lg bg-orange-600 text-white flex items-center justify-center shadow-xs flex-shrink-0">
+                                          <ClipboardList className="w-3.5 h-3.5" />
+                                        </div>
+                                        <div>
+                                          <div className={`text-xs font-bold uppercase tracking-wider ${
+                                            darkMode ? 'text-orange-300' : 'text-orange-900'
+                                          }`}>
+                                            Student Action Checklist (What You Must Do)
+                                          </div>
+                                          <div className={`text-[10.5px] ${
+                                            darkMode ? 'text-orange-200/70' : 'text-orange-700/80'
+                                          }`}>
+                                            Mandatory tasks required from students before the deadline
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full flex-shrink-0 ${
+                                        darkMode ? 'bg-orange-500/20 text-orange-300 border border-orange-500/30' : 'bg-white text-orange-800 border border-orange-200 shadow-2xs'
+                                      }`}>
+                                        3 Steps
+                                      </span>
+                                    </div>
+
+                                    {/* Step 1 */}
+                                    <div className={`p-3.5 rounded-xl border border-l-4 border-l-orange-500 flex items-start gap-3 transition-all ${
+                                      darkMode ? 'bg-slate-800/30 border-slate-700/60' : 'bg-slate-50/80 border-slate-200/80'
+                                    }`}>
+                                      <div className="w-7 h-7 rounded-lg bg-orange-600 text-white flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5 shadow-xs">
+                                        1
+                                      </div>
+                                      <div className="text-xs leading-relaxed flex-1">
+                                        <div className="flex items-center gap-2 mb-1">
+                                          <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-orange-500/15 text-orange-700 dark:text-orange-300">
+                                            Step 1
+                                          </span>
+                                          <span className={`font-semibold ${darkMode ? 'text-slate-100' : 'text-slate-900'}`}>
+                                            Check retake exam schedule
+                                          </span>
+                                        </div>
+                                        <p className={darkMode ? 'text-slate-300' : 'text-slate-600'}>
+                                          Review your exam dates in the{' '}
+                                          <a 
+                                            href="https://docs.google.com/spreadsheets/d/1Dj9MiKupgDBFr8GGaJIKbt6GlPgVcQELVLam8EGl0cM/edit?gid=218939538#gid=218939538" 
+                                            target="_blank" 
+                                            rel="noopener noreferrer"
+                                            className="font-medium text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-0.5"
+                                          >
+                                            <span>MEC - Teaching Plan - AY2026-2027</span>
+                                            <ArrowUpRight className="w-3 h-3" />
+                                          </a>.
+                                        </p>
+                                      </div>
+                                    </div>
+
+                                    {/* Step 2 */}
+                                    <div className={`p-3.5 rounded-xl border border-l-4 border-l-orange-500 flex items-start gap-3 transition-all ${
+                                      darkMode ? 'bg-slate-800/30 border-slate-700/60' : 'bg-slate-50/80 border-slate-200/80'
+                                    }`}>
+                                      <div className="w-7 h-7 rounded-lg bg-orange-600 text-white flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5 shadow-xs">
+                                        2
+                                      </div>
+                                      <div className="text-xs leading-relaxed flex-1 space-y-2">
+                                        <div className="flex items-center gap-2 mb-0.5">
+                                          <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-orange-500/15 text-orange-700 dark:text-orange-300">
+                                            Step 2
+                                          </span>
+                                          <span className={`font-semibold ${darkMode ? 'text-slate-100' : 'text-slate-900'}`}>
+                                            Check eligibility
+                                          </span>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 gap-2">
+                                          {/* Eligible */}
+                                          <div className={`p-2.5 rounded-lg border flex items-start gap-2.5 ${
+                                            darkMode ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-emerald-50/60 border-emerald-200/80'
+                                          }`}>
+                                            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
+                                            <div>
+                                              <span className={`font-semibold inline-block mr-1.5 ${
+                                                darkMode ? 'text-emerald-300' : 'text-emerald-900'
+                                              }`}>
+                                                Eligible:
+                                              </span>
+                                              <span className={darkMode ? 'text-slate-300' : 'text-slate-700'}>
+                                                Students who previously <strong>failed</strong> or <strong>were eligible but did not register</strong> for the final exam in the previous semester.
+                                              </span>
+                                            </div>
+                                          </div>
+
+                                          {/* Not Eligible */}
+                                          <div className={`p-2.5 rounded-lg border flex items-start gap-2.5 ${
+                                            darkMode ? 'bg-rose-500/5 border-rose-500/20' : 'bg-rose-50/60 border-rose-200/80'
+                                          }`}>
+                                            <XCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 flex-shrink-0 mt-0.5" />
+                                            <div>
+                                              <span className={`font-semibold inline-block mr-1.5 ${
+                                                darkMode ? 'text-rose-300' : 'text-rose-900'
+                                              }`}>
+                                                Not Eligible:
+                                              </span>
+                                              <span className={darkMode ? 'text-slate-300' : 'text-slate-700'}>
+                                                Students <strong>banned</strong> due to not meeting the prerequisites for the final exam in the previous semester (must re-enroll and retake the entire course).
+                                              </span>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    {/* Step 3 */}
+                                    <div className={`p-3.5 rounded-xl border border-l-4 border-l-orange-500 flex items-start gap-3 transition-all ${
+                                      darkMode ? 'bg-slate-800/30 border-slate-700/60' : 'bg-slate-50/80 border-slate-200/80'
+                                    }`}>
+                                      <div className="w-7 h-7 rounded-lg bg-orange-600 text-white flex-shrink-0 mt-0.5 font-bold text-xs flex items-center justify-center shadow-xs">
+                                        3
+                                      </div>
+                                      <div className="text-xs leading-relaxed flex-1 space-y-1.5">
+                                        <div className="flex items-center gap-2 mb-1">
+                                          <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-orange-500/15 text-orange-700 dark:text-orange-300">
+                                            Step 3
+                                          </span>
+                                          <span className={`font-semibold ${darkMode ? 'text-slate-100' : 'text-slate-900'}`}>
+                                            Fill in the Retake Registration Form
+                                          </span>
+                                        </div>
+                                        <p className={darkMode ? 'text-slate-300' : 'text-slate-600'}>
+                                          Submit your registration via{' '}
+                                          <a 
+                                            href="https://forms.gle/CkecUGbfnLmz5E5u6" 
+                                            target="_blank" 
+                                            rel="noopener noreferrer"
+                                            className="font-semibold text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-0.5"
+                                          >
+                                            <span>the official Retake Registration Form</span>
+                                            <ArrowUpRight className="w-3 h-3" />
+                                          </a>.
+                                        </p>
+                                        <div className={`p-2.5 rounded-lg text-[11.5px] leading-normal flex items-center gap-2 ${
+                                          darkMode ? 'bg-slate-800/60 text-slate-300 border border-slate-700/60' : 'bg-slate-100/90 text-slate-700 border border-slate-200/70'
+                                        }`}>
+                                          <Info className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
+                                          <span>
+                                            You can come back to the form to <strong>cancel or update</strong> the registration anytime before the deadline.
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  {/* Section Divider */}
+                                  <div className="pt-1 flex items-center gap-2">
+                                    <div className={`h-px flex-1 ${darkMode ? 'bg-slate-800' : 'bg-slate-200'}`} />
+                                    <span className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                                      Deadlines & Department Review
+                                    </span>
+                                    <div className={`h-px flex-1 ${darkMode ? 'bg-slate-800' : 'bg-slate-200'}`} />
+                                  </div>
+
+                                  {/* Strict Deadline Notice */}
                                   <div className={`p-3.5 rounded-xl border flex items-start gap-3 ${
                                     darkMode ? 'bg-amber-500/5 border-amber-500/20 text-slate-300' : 'bg-amber-50/60 border-amber-200/80 text-slate-700'
                                   }`}>
@@ -1854,69 +2341,28 @@ export default function App() {
                                     </div>
                                     <div className="text-xs leading-relaxed">
                                       <div className={`font-semibold mb-0.5 ${darkMode ? 'text-amber-300' : 'text-amber-900'}`}>
-                                        Registration Deadline: 7 Days Prior to Exam Date
+                                        Strict Deadline: 7 Days Prior to Exam Date
                                       </div>
                                       <p className={darkMode ? 'text-slate-300' : 'text-slate-600'}>
-                                        All retake registrations must be submitted at least <strong>7 calendar days before the exam date</strong>. Late requests are strictly rejected. Check the official schedule in the{' '}
-                                        <a 
-                                          href="https://docs.google.com/spreadsheets/d/1Dj9MiKupgDBFr8GGaJIKbt6GlPgVcQELVLam8EGl0cM/edit?gid=218939538#gid=218939538" 
-                                          target="_blank" 
-                                          rel="noopener noreferrer"
-                                          className="font-medium text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-0.5"
-                                        >
-                                          <span>MEC Teaching Plan AY 2026-2027</span>
-                                          <ArrowUpRight className="w-3 h-3" />
-                                        </a>.
+                                        The registration form will be <strong>strictly closed 7 calendar days</strong> before the retake exam date. Late requests are rejected.
                                       </p>
                                     </div>
                                   </div>
 
-                                  {/* Eligibility Section (Who Can vs Who Cannot) */}
-                                  <div className="space-y-2.5">
-                                    <div className={`text-[11px] font-bold uppercase tracking-wider ${
-                                      darkMode ? 'text-slate-400' : 'text-slate-500'
-                                    }`}>
-                                      Registration Eligibility Criteria
+                                  {/* MEC Retake Eligibility Verification Notice */}
+                                  <div className={`p-3.5 rounded-xl border flex items-start gap-3 ${
+                                    darkMode ? 'bg-slate-800/30 border-slate-700/60' : 'bg-slate-50/80 border-slate-200/80'
+                                  }`}>
+                                    <div className="p-1 rounded-md bg-orange-500/10 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5">
+                                      <CheckCircle2 className="w-4 h-4" />
                                     </div>
-
-                                    <div className="grid grid-cols-1 gap-2.5">
-                                      {/* Permitted */}
-                                      <div className={`p-3.5 rounded-xl border flex items-start gap-3 ${
-                                        darkMode ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-emerald-50/50 border-emerald-200/80'
-                                      }`}>
-                                        <div className="p-1 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5">
-                                          <CheckCircle2 className="w-4 h-4" />
-                                        </div>
-                                        <div className="text-xs leading-relaxed">
-                                          <span className={`font-semibold inline-block mr-1.5 ${
-                                            darkMode ? 'text-emerald-300' : 'text-emerald-900'
-                                          }`}>
-                                            Eligible:
-                                          </span>
-                                          <span className={darkMode ? 'text-slate-300' : 'text-slate-700'}>
-                                            Students who previously <strong>failed</strong> or officially <strong>stepped back</strong> from the exam in a prior semester.
-                                          </span>
-                                        </div>
-                                      </div>
-
-                                      {/* Ineligible */}
-                                      <div className={`p-3.5 rounded-xl border flex items-start gap-3 ${
-                                        darkMode ? 'bg-rose-500/5 border-rose-500/20' : 'bg-rose-50/50 border-rose-200/80'
-                                      }`}>
-                                        <div className="p-1 rounded-md bg-rose-500/10 text-rose-600 dark:text-rose-400 flex-shrink-0 mt-0.5">
-                                          <XCircle className="w-4 h-4" />
-                                        </div>
-                                        <div className="text-xs leading-relaxed">
-                                          <span className={`font-semibold inline-block mr-1.5 ${
-                                            darkMode ? 'text-rose-300' : 'text-rose-900'
-                                          }`}>
-                                            Not Eligible:
-                                          </span>
-                                          <span className={darkMode ? 'text-slate-300' : 'text-slate-700'}>
-                                            Students <strong>banned due to insufficient attendance</strong> cannot retake the exam directly. They must <strong>re-enroll and retake the entire course</strong> in a subsequent semester.
-                                          </span>
-                                        </div>
-                                      </div>
+                                    <div className="text-xs leading-relaxed">
+                                      <span className={`font-semibold block mb-0.5 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
+                                        Eligibility Verification by MEC Program
+                                      </span>
+                                      <p className={darkMode ? 'text-slate-300' : 'text-slate-600'}>
+                                        The MEC Program will verify your eligibility for the retake examination registration before adding your name to the finalized official exam roster.
+                                      </p>
                                     </div>
                                   </div>
 
@@ -1953,194 +2399,6 @@ export default function App() {
                               </a>
                             </div>
                           </div>
-
-                          {/* Card B: STEP-BACK FROM A FINAL EXAM */}
-                          <div 
-                            id="card-stepback-final-exam"
-                            className={`rounded-2xl border transition-all duration-200 overflow-hidden flex flex-col justify-between ${
-                              darkMode 
-                                ? 'bg-slate-900/60 border-slate-800 backdrop-blur-sm shadow-sm' 
-                                : 'bg-white border-slate-200/90 shadow-xs'
-                            }`}
-                          >
-                            <div>
-                              {/* Header & Toggle Bar */}
-                              <div className={`p-4 sm:p-5 flex items-center justify-between border-b ${
-                                darkMode ? 'border-slate-800 bg-slate-900/40' : 'border-slate-100 bg-slate-50/60'
-                              }`}>
-                                <div className="flex items-center gap-3">
-                                  <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center flex-shrink-0">
-                                    <ShieldAlert className="w-4 h-4" />
-                                  </div>
-                                  <div>
-                                    <div className="flex items-center gap-2">
-                                      <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
-                                        Section B
-                                      </span>
-                                      <span className="text-slate-300 dark:text-slate-700">•</span>
-                                      <span className={`text-[11px] font-medium ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                                        Exam Withdrawal
-                                      </span>
-                                    </div>
-                                    <h3 className={`text-sm sm:text-base font-bold tracking-tight ${
-                                      darkMode ? 'text-white' : 'text-slate-900'
-                                    }`}>
-                                      Step-Back from a Final Exam
-                                    </h3>
-                                  </div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <a
-                                    href="https://forms.gle/CkecUGbfnLmz5E5u6"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    id="stepback-register-link-btn"
-                                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-xs"
-                                  >
-                                    <span>Submit Step-Back</span>
-                                    <ArrowUpRight className="w-3.5 h-3.5" />
-                                  </a>
-                                  <button
-                                    type="button"
-                                    onClick={() => setIsStepBackRulesExpanded(prev => !prev)}
-                                    className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                                      darkMode ? 'hover:bg-slate-800 text-slate-400 hover:text-white' : 'hover:bg-slate-100 text-slate-500 hover:text-slate-900'
-                                    }`}
-                                    aria-label="Toggle Step-Back Rules"
-                                  >
-                                    <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${
-                                      (isStepBackRulesExpanded || query.trim().length > 0) ? 'rotate-180' : ''
-                                    }`} />
-                                  </button>
-                                </div>
-                              </div>
-
-                              {/* Card Body */}
-                              {(isStepBackRulesExpanded || query.trim().length > 0) && (
-                                <div className="p-5 space-y-4">
-                                  {/* Status & Options Overview */}
-                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                                    <div className={`p-3.5 rounded-xl border ${
-                                      darkMode ? 'bg-slate-800/30 border-slate-700/60' : 'bg-slate-50/80 border-slate-200/80'
-                                    }`}>
-                                      <div className={`text-[11px] font-bold uppercase tracking-wider mb-1 ${
-                                        darkMode ? 'text-slate-400' : 'text-slate-500'
-                                      }`}>
-                                        Automatic Inclusion
-                                      </div>
-                                      <p className={`text-xs leading-relaxed ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
-                                        All enrolled students are placed on the <strong>Tentative Final Exam List</strong> by default.
-                                      </p>
-                                    </div>
-
-                                    <div className={`p-3.5 rounded-xl border ${
-                                      darkMode ? 'bg-slate-800/30 border-slate-700/60' : 'bg-slate-50/80 border-slate-200/80'
-                                    }`}>
-                                      <div className={`text-[11px] font-bold uppercase tracking-wider mb-1 ${
-                                        darkMode ? 'text-slate-400' : 'text-slate-500'
-                                      }`}>
-                                        Taking the Exam
-                                      </div>
-                                      <p className={`text-xs leading-relaxed ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
-                                        If you plan to sit for the final examination, <strong>no action is required</strong>.
-                                      </p>
-                                    </div>
-                                  </div>
-
-                                  {/* Withdrawal Instructions */}
-                                  <div className={`p-3.5 rounded-xl border flex items-start gap-3 ${
-                                    darkMode ? 'bg-blue-500/5 border-blue-500/20' : 'bg-blue-50/50 border-blue-200/80'
-                                  }`}>
-                                    <div className="p-1 rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5">
-                                      <Info className="w-4 h-4" />
-                                    </div>
-                                    <div className="text-xs leading-relaxed">
-                                      <span className={`font-semibold block mb-0.5 ${darkMode ? 'text-blue-300' : 'text-blue-900'}`}>
-                                        How to Step Back from a Module Exam
-                                      </span>
-                                      <span className={darkMode ? 'text-slate-300' : 'text-slate-600'}>
-                                        If you choose not to take the exam, you must submit{' '}
-                                        <a 
-                                          href="https://forms.gle/CkecUGbfnLmz5E5u6" 
-                                          target="_blank" 
-                                          rel="noopener noreferrer"
-                                          className="font-semibold text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-0.5"
-                                        >
-                                          <span>this official form</span>
-                                          <ArrowUpRight className="w-3 h-3" />
-                                        </a>{' '}
-                                        and select <em>“Stepping back from the final exam”</em> for each specific module.
-                                      </span>
-                                    </div>
-                                  </div>
-
-                                  {/* Deadline Notice */}
-                                  <div className={`p-3.5 rounded-xl border flex items-start gap-3 ${
-                                    darkMode ? 'bg-amber-500/5 border-amber-500/20 text-slate-300' : 'bg-amber-50/60 border-amber-200/80 text-slate-700'
-                                  }`}>
-                                    <div className="p-1 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5">
-                                      <Clock className="w-4 h-4" />
-                                    </div>
-                                    <div className="text-xs leading-relaxed">
-                                      <div className={`font-semibold mb-0.5 ${darkMode ? 'text-amber-300' : 'text-amber-900'}`}>
-                                        Submission Deadline: 7 Days Prior to Exam Date
-                                      </div>
-                                      <p className={darkMode ? 'text-slate-300' : 'text-slate-600'}>
-                                        Withdrawal requests must be completed <strong>no later than 7 calendar days before the exam date</strong>. Consult exam dates in the{' '}
-                                        <a 
-                                          href="https://docs.google.com/spreadsheets/d/1Dj9MiKupgDBFr8GGaJIKbt6GlPgVcQELVLam8EGl0cM/edit?gid=218939538#gid=218939538" 
-                                          target="_blank" 
-                                          rel="noopener noreferrer"
-                                          className="font-medium text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-0.5"
-                                        >
-                                          <span>MEC Teaching Plan AY 2026-2027</span>
-                                          <ArrowUpRight className="w-3 h-3" />
-                                        </a>.
-                                      </p>
-                                    </div>
-                                  </div>
-
-                                  {/* Compulsory Attendance Notice */}
-                                  <div className={`p-3.5 rounded-xl border flex items-start gap-3 ${
-                                    darkMode ? 'bg-slate-800/40 border-slate-700/80' : 'bg-slate-50 border-slate-200'
-                                  }`}>
-                                    <div className="p-1 rounded-md bg-orange-500/10 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5">
-                                      <AlertTriangle className="w-4 h-4" />
-                                    </div>
-                                    <div className="text-xs leading-relaxed">
-                                      <span className={`font-semibold block mb-0.5 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
-                                        Compulsory Attendance on Finalized Exam List
-                                      </span>
-                                      <span className={darkMode ? 'text-slate-400' : 'text-slate-600'}>
-                                        Once the exam list is finalized, attendance is mandatory. Failure to attend without approved circumstances results in a <strong className="text-rose-600 dark:text-rose-400 font-semibold">Failed Grade (5.0)</strong> and counts as one examination attempt.
-                                      </span>
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-
-                            {/* Mobile action button */}
-                            <div className="p-3 sm:hidden border-t border-slate-100 dark:border-slate-800/60">
-                              <a
-                                href="https://forms.gle/CkecUGbfnLmz5E5u6"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-blue-600 text-white"
-                              >
-                                <span>Submit Step-Back Form</span>
-                                <ArrowUpRight className="w-3.5 h-3.5" />
-                              </a>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {filteredExamCards.length > 0 && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5" id="exam-cards-grid">
-                          {filteredExamCards.map((card, idx) => (
-                            <PortalCardComponent key={idx} card={card} darkMode={darkMode} />
-                          ))}
                         </div>
                       )}
 
@@ -2173,7 +2431,7 @@ export default function App() {
                           id="btn-view-grade-scale-quick-link"
                           onClick={() => {
                             if (searchQuery) setSearchQuery('');
-                            navigateToTabAndScroll('curriculum-regulations', 'section-grade-conversion-wrapper');
+                            navigateToTabAndScroll('regulations', 'section-grade-conversion-wrapper');
                           }}
                           className="px-3.5 py-2 rounded-xl text-xs font-bold bg-orange-500 hover:bg-orange-600 text-white transition-all shadow-sm hover:shadow flex items-center gap-2 self-start sm:self-center cursor-pointer whitespace-nowrap"
                         >
@@ -2186,10 +2444,10 @@ export default function App() {
                 </div>
               )}
 
-              {/* 3. CURRICULUM & REGULATIONS */}
-              {activeTab === 'curriculum-regulations' && (
-                <div className="space-y-8" id="section-curriculum-regulations">
-                  {/* Part A: Curriculum */}
+              {/* 3. CURRICULUM */}
+              {activeTab === 'curriculum' && (
+                <div className="space-y-8" id="section-curriculum">
+                  {/* Curriculum Framework */}
                   {(curriculumOverviewMatches || filteredCurriculumCards.length > 0) && (
                     <div className="space-y-4">
                       <div className="flex items-center space-x-2">
@@ -2670,16 +2928,26 @@ export default function App() {
                       )}
                     </div>
                   )}
+                </div>
+              )}
 
-                  {/* Part B: Regulations */}
+              {/* 4. REGULATIONS */}
+              {activeTab === 'regulations' && (
+                <div className="space-y-8" id="section-regulations">
+                  {/* Comprehensive Official Examination & Study Regulations (2026) */}
+                  {(officialRegulationsMatches || !query) && (
+                    <MecRegulationsOfficial darkMode={darkMode} searchQuery={query} />
+                  )}
+
+                  {/* Official Regulations & Policies */}
                   {(foundationTransitionMatches || retakeRegulationsMatches || filteredRegulationCards.length > 0) && (
-                    <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-850">
+                    <div className="space-y-4">
                       <div className="flex items-center space-x-2">
                         <ShieldAlert className="w-5 h-5 text-orange-500" />
                         <h2 className={`text-base font-extrabold tracking-tight ${
                           darkMode ? 'text-slate-200' : 'text-slate-800'
                         }`}>
-                          Official Regulations & Policies
+                          Key Academic Policies & Transition Rules
                         </h2>
                       </div>
 
@@ -2793,7 +3061,7 @@ export default function App() {
                                   </h3>
                                 </div>
                                 <span className="px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase rounded bg-rose-500/10 text-rose-500 border border-rose-500/20">
-                                  Max 2 Retakes
+                                  Max 3 Retakes (4 Attempts)
                                 </span>
                               </div>
                               <p className={`text-xs leading-relaxed mb-4 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
@@ -2813,7 +3081,7 @@ export default function App() {
                                     </div>
                                     <div>
                                       <h4 className={`font-bold mb-1 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
-                                        No Retakes for Passed Modules
+                                        No Retakes for Passed Modules (§ 20(1))
                                       </h4>
                                       <p className={`leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
                                         Once you have passed a module examination, you are <strong className="text-rose-500 font-semibold">not permitted to re-register or retake</strong> it to improve your grade <em>(with a limited exception specifically governing Bachelor Thesis re-submission)</em>.
@@ -2834,10 +3102,10 @@ export default function App() {
                                     </div>
                                     <div>
                                       <h4 className={`font-bold mb-1 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
-                                        Maximum Number of Retakes
+                                        Maximum Number of Retakes (§ 20(2))
                                       </h4>
                                       <p className={`leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-                                        For each examination or module component evaluated as failed on the first attempt, you are permitted <strong className="text-amber-500 font-semibold">a maximum of 2 retakes</strong> <em>(providing a total of <strong className="text-slate-900 dark:text-white font-semibold">up to 3 exam attempts</strong> per module)</em>.
+                                        For each examination or module component evaluated as failed on the first attempt, you are permitted <strong className="text-amber-500 font-semibold">a maximum of 3 retakes</strong> <em>(providing a total of <strong className="text-slate-900 dark:text-white font-semibold">up to 4 exam attempts</strong> per module)</em>.
                                       </p>
                                     </div>
                                   </div>
@@ -3080,7 +3348,7 @@ export default function App() {
                 </div>
               )}
 
-              {/* 4. FORMS */}
+              {/* 5. FORMS */}
               {activeTab === 'forms' && (
                 <div className="space-y-4" id="section-forms">
                   <div className="flex items-center space-x-2">

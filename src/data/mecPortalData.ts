@@ -30,7 +30,8 @@ export const DUMMY_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSf_dummy
 export const PORTAL_TABS = [
   { id: 'guidelines', label: 'Guidelines', icon: 'BookOpen', isTba: false, isLocked: false },
   { id: 'schedules-exams', label: 'Schedules & Exams', icon: 'Calendar', isTba: false, isLocked: false },
-  { id: 'curriculum-regulations', label: 'Curriculum & Regulations', icon: 'Cpu', isTba: false, isLocked: false },
+  { id: 'curriculum', label: 'Curriculum', icon: 'Cpu', isTba: false, isLocked: false },
+  { id: 'regulations', label: 'Regulations', icon: 'ShieldAlert', isTba: false, isLocked: false },
   { id: 'forms', label: 'Forms', icon: 'ClipboardList', isTba: false, isLocked: false },
   { id: 'internship-thesis', label: 'Internship & Bachelor Thesis', icon: 'GraduationCap', isTba: true, isLocked: true },
   { id: 'scholarship-exchange', label: 'Scholarship & Exchange', icon: 'Globe', isTba: true, isLocked: true },
@@ -44,9 +45,7 @@ export const EXAM_CARDS: PortalCard[] = [
     title: "Exam Attendence List_WS2026",
     description: "Official finalized examination attendance roster and student room assignments for Winter Semester 2026.",
     type: "LINK",
-    url: "#",
-    isTba: true,
-    statusTag: "Upcoming"
+    url: "https://docs.google.com/spreadsheets/d/17Gwpw-hVJhoRx8oESlUeByeqK7_cSKhzZcbMPIZrhu4/edit?gid=2044431821#gid=2044431821"
   },
   {
     title: "Exam Inspection Request",
