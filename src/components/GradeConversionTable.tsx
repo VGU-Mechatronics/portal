@@ -129,9 +129,6 @@ export default function GradeConversionTable({ darkMode, searchQuery = '' }: Gra
             </div>
             <div>
               <div className="flex items-center gap-2 flex-wrap mb-1">
-                <span className="px-2 py-0.5 text-[10px] font-mono font-extrabold uppercase rounded bg-orange-500/10 text-orange-500 border border-orange-500/20">
-                  Article 19 · Regulations
-                </span>
                 <span className={`text-[11px] font-mono font-bold ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
                   VGU – HAW Hamburg Examination Regulations
                 </span>
@@ -273,10 +270,10 @@ export default function GradeConversionTable({ darkMode, searchQuery = '' }: Gra
             </div>
             
             <div className="flex items-center gap-2">
-              <span className={`px-2 py-0.5 text-[10px] font-mono font-bold uppercase rounded border ${
+              <span className={`px-2.5 py-1 text-[10.5px] font-mono font-bold uppercase rounded-lg border ${
                 CATEGORY_STYLES[conversionResult.match.category][darkMode ? 'badgeDark' : 'badgeLight']
               }`}>
-                {conversionResult.match.classificationDe} · {conversionResult.match.classificationEn}
+                {conversionResult.match.classificationEn}
               </span>
             </div>
           </div>
@@ -313,7 +310,7 @@ export default function GradeConversionTable({ darkMode, searchQuery = '' }: Gra
                 }`}
               >
                 <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
-                <span>{style.labelDe} · {style.labelEn} ({count})</span>
+                <span>{style.labelEn} ({count})</span>
               </button>
             );
           })}
@@ -382,7 +379,7 @@ export default function GradeConversionTable({ darkMode, searchQuery = '' }: Gra
                             <span className={`px-2 py-0.5 text-[9.5px] font-mono font-bold rounded border ${
                               CATEGORY_STYLES[row.category][darkMode ? 'badgeDark' : 'badgeLight']
                             }`}>
-                              {row.classificationDe} ({row.classificationEn})
+                              {row.classificationEn}
                             </span>
                           </td>
                         </tr>
@@ -452,7 +449,7 @@ export default function GradeConversionTable({ darkMode, searchQuery = '' }: Gra
                             <span className={`px-2 py-0.5 text-[9.5px] font-mono font-bold rounded border ${
                               CATEGORY_STYLES[row.category][darkMode ? 'badgeDark' : 'badgeLight']
                             }`}>
-                              {row.classificationDe} ({row.classificationEn})
+                              {row.classificationEn}
                             </span>
                           </td>
                         </tr>

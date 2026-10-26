@@ -6,10 +6,12 @@
 export interface PortalCard {
   title: string;
   description?: string;
-  type: 'PDF' | 'LINK' | 'DRIVE' | 'FORM' | 'EXCEL' | 'DOCX';
+  type: 'LINK' | 'FORM';
   url: string;
   isTba?: boolean;
   statusTag?: 'Current' | 'Upcoming' | 'Archived' | string;
+  onClick?: () => void;
+  actionLabel?: string;
 }
 
 export interface FAQItem {
@@ -60,7 +62,7 @@ export interface ArchivedSchedule {
   semester: string;
   academicYear: string;
   termTitle: string;
-  type: 'LINK' | 'DRIVE' | 'EXCEL';
+  type: 'LINK';
   url: string;
   status: string;
 }
@@ -98,7 +100,7 @@ export interface StudentListResource {
   subtitle: string;
   cohort: string;
   url: string;
-  type: 'LINK' | 'EXCEL' | 'DRIVE';
+  type: 'LINK';
 }
 
 export const STUDENT_LIST_RESOURCE: StudentListResource = {
@@ -113,33 +115,27 @@ export const CURRICULUM_CARDS: PortalCard[] = [
   {
     title: "HAW Hamburg Module Handbook",
     description: "The complete German accredited module handbook specifying credits, learning outcomes, and assessment styles.",
-    type: "DRIVE",
+    type: "LINK",
     url: "https://drive.google.com/file/d/1rh3PepYMkBW5jeH974UE_YP1VKTuwyCB/view?usp=sharing"
   }
 ];
 
 export const REGULATION_CARDS: PortalCard[] = [
   {
-    title: "General Academic Regulations",
-    description: "Core regulatory framework governing studies, grades, attendance, and student conduct at VGU.",
-    type: "PDF",
-    url: "https://drive.google.com/file/d/1ZnSs0yf3dfuOvu5Uvu-5Ph02n9uT3xjG/view?usp=sharing"
-  },
-  {
-    title: "MEC Specific Examination Regulations",
-    description: "Prerequisites, credit definitions, German-Vietnamese grading standards, and thesis defense guidelines.",
-    type: "PDF",
-    url: "https://drive.google.com/file/d/1Mk7j64VLJRwcZjAoLXu_Yu81wVQmHV5l/view?usp=sharing"
-  },
-  {
-    title: "Basic Intership Regulations",
-    description: "TBA",
-    type: "PDF",
-    url: DUMMY_DRIVE_URL
+    title: "Official Examination & Academic Regulations (HAW Hamburg & VGU)",
+    description: "Official B.Sc. Mechatronics degree regulations: 210 CP, 3.5-year duration (7 semesters), M1-M12 progression gatekeeper, 80% compulsory attendance (Seminar, Lab, Exercise), max 4 attempts (3 retakes), 180 CP Bachelor Thesis with Colloquium (Module M46), and Absence & Withdrawal rules.",
+    type: "LINK",
+    url: "/assets/aistudio/MEC_-_Regulations_6ffccfc0.pdf"
   }
 ];
 
 export const FORM_CARDS: PortalCard[] = [
+  {
+    title: "Student Grade & Record Lookup",
+    description: "Quickly check your study progress and grades sent directly to your student email. Enter your Student ID and Personal ID (CCCD/Passport) to receive your latest academic performance summary.",
+    type: "FORM",
+    url: "https://forms.gle/rtpY2Rf6ixKkoaDZ8"
+  },
   {
     title: "Student Verification & Academic Status Certificates",
     description: "Official guidelines for students requesting enrollment verification, academic status certificates, and transcripts issued by VGU.",
@@ -172,13 +168,13 @@ export const BASIC_INTERNSHIP_CARDS: PortalCard[] = [
   {
     title: "HAW Hamburg - Basic Internship Regulations (Vorpraxis Richtlinie)",
     description: "HAW_Mechatronik_Vorpraxis_Richtlinie en-GB.pdf: Official German regulations detailing the 3 mandatory sections (Design, Mechanical, Electrical) and accreditation standards.",
-    type: "PDF",
+    type: "LINK",
     url: DUMMY_DRIVE_URL
   },
   {
     title: "VGU Official Notice: Basic Internship Regulations",
     description: "Official circular from Ms. Yen Tran (Faculty of Engineering) on completion rules, hard deadline (end of Semester 3), 15,000,000 VND tuition fee, and re-enrollment policy.",
-    type: "DOCX",
+    type: "LINK",
     url: DUMMY_DRIVE_URL
   },
   {
@@ -190,7 +186,7 @@ export const BASIC_INTERNSHIP_CARDS: PortalCard[] = [
   {
     title: "Basic Internship Weekly Logbook & Report Template",
     description: "Official portfolio template for documenting workshop operations across all 3 sections with company/instructor evaluation slips.",
-    type: "DOCX",
+    type: "LINK",
     url: DUMMY_DRIVE_URL
   }
 ];
@@ -199,25 +195,25 @@ export const INDUSTRIAL_PLACEMENT_CARDS: PortalCard[] = [
   {
     title: "Industrial Placement Regulations",
     description: "Advanced engineering criteria, systems automation placement rules, duration (minimum 12 weeks), and defense requirements.",
-    type: "DRIVE",
+    type: "LINK",
     url: DUMMY_DRIVE_URL
   },
   {
     title: "Industrial Placement Authorization Letter",
     description: "Request an official introductory recommendation letter signed by VGU to present to external corporate hosts.",
-    type: "DRIVE",
+    type: "LINK",
     url: DUMMY_DRIVE_URL
   },
   {
     title: "Enterprise Supervisor Evaluation Form",
     description: "Confidential evaluation rubric and appraisal slip completed by the company industrial mentor upon placement completion.",
-    type: "DRIVE",
+    type: "LINK",
     url: DUMMY_DRIVE_URL
   },
   {
     title: "Industrial Placement Final Technical Report Template",
     description: "Standard engineering report template covering system architectures, PLC/SCADA loops, and mechatronic design outcomes.",
-    type: "DRIVE",
+    type: "LINK",
     url: DUMMY_DRIVE_URL
   }
 ];
@@ -231,13 +227,13 @@ export const SCHOLARSHIP_CARDS: PortalCard[] = [
   {
     title: "VGU Merit Scholarship Policy",
     description: "Rules governing merit-based tuition fee discounts (up to 100%) calculated from annual GPA rankings.",
-    type: "DRIVE",
+    type: "LINK",
     url: "https://vgu.edu.vn/documents/48694/12962566/20260320_213_QD-DHVD_Ve+viec+ban+hanh+Quy+dinh+ve+hoc+bong+tai+nang+cac+chuong+trinh+dao+tao+trinh+do+DH-VIE.pdf/260ef17b-a749-48ca-80e1-bb89a8c429db"
   },
   {
     title: "DAAD Scholarships",
     description: "Financial grants and sponsorship pathways for high-performing students completing their exchange semester in Germany.",
-    type: "DRIVE",
+    type: "LINK",
     url: DUMMY_DRIVE_URL,
     isTba: true
   }
@@ -247,25 +243,25 @@ export const THESIS_CARDS: PortalCard[] = [
   {
     title: "Bachelor Thesis Guidelines & Milestones",
     description: "Comprehensive timeline spanning supervisor pairing, abstract submission, draft editing, and final submission rules.",
-    type: "DRIVE",
+    type: "LINK",
     url: DUMMY_DRIVE_URL
   },
   {
     title: "Thesis Proposal Template & Approval Slip",
     description: "Form to register thesis title, research scope, and obtain mandatory signatures from both VGU and Hamburg advisors.",
-    type: "DRIVE",
+    type: "LINK",
     url: DUMMY_DRIVE_URL
   },
   {
     title: "Defense Evaluation Criteria Matrix",
     description: "Transparent grading rubric highlighting thesis presentation layout, engineering execution, and Q&A defense performance.",
-    type: "DRIVE",
+    type: "LINK",
     url: DUMMY_DRIVE_URL
   },
   {
     title: "Formatting & Style Guidelines",
     description: "Latex and Word templates configured for standard MEC thesis drafts, referencing layout standards.",
-    type: "DRIVE",
+    type: "LINK",
     url: DUMMY_DRIVE_URL
   }
 ];
@@ -274,19 +270,19 @@ export const GRADUATION_CARDS: PortalCard[] = [
   {
     title: "Degree Requirements Checklist",
     description: "Graduation planning spreadsheet to self-verify that your total accumulated credits meet VGU and HAW Hamburg standards.",
-    type: "DRIVE",
+    type: "LINK",
     url: DUMMY_DRIVE_URL
   },
   {
     title: "VGU Credit Transfer Request Form",
     description: "Official form to transfer academic credits earned during Hamburg exchange or other accredited summer modules.",
-    type: "DRIVE",
+    type: "LINK",
     url: DUMMY_DRIVE_URL
   },
   {
     title: "Graduation Gown & Ceremony Protocols",
     description: "Details regarding the annual graduation ceremony, outfit sizing, gown rentals, guest invitations, and diploma dispatch.",
-    type: "DRIVE",
+    type: "LINK",
     url: DUMMY_DRIVE_URL
   }
 ];
@@ -295,21 +291,21 @@ export const EXCHANGE_CARDS: PortalCard[] = [
   {
     title: "HAW Hamburg Semester Exchange Guide",
     description: "Essential information regarding visa applications, student accommodation in Hamburg, cost of living, and health insurance.",
-    type: "DRIVE",
+    type: "LINK",
     url: DUMMY_DRIVE_URL,
     isTba: true
   },
   {
     title: "Learning Agreement Template",
     description: "Pre-approved subject mapping list to guarantee academic equivalence and seamless credit transfer on return.",
-    type: "DRIVE",
+    type: "LINK",
     url: DUMMY_DRIVE_URL,
     isTba: true
   },
   {
     title: "DAAD Exchange Scholarship Application",
     description: "How to apply for German Academic Exchange Service (DAAD) scholarships supporting long-term travel and living grants.",
-    type: "DRIVE",
+    type: "LINK",
     url: DUMMY_DRIVE_URL,
     isTba: true
   }
@@ -318,15 +314,11 @@ export const EXCHANGE_CARDS: PortalCard[] = [
 export const FAQ_ITEMS: FAQItem[] = [
   {
     question: "How many attempts do I have to pass an examination?",
-    answer: "You are permitted two resits for each examination you do not pass at the first attempt, meaning you have a total of three attempts."
+    answer: "You are permitted three resits for each examination you do not pass at the first attempt, meaning you have a total of four attempts."
   },
   {
-    question: "What happens if I fail a subject after all three attempts?",
-    answer: "If you exhaust all resits without success, the examination is deemed \"conclusively unsuccessful\" (endgültig nicht bestanden), which typically disqualifies you from continuing the MEC program."
-  },
-  {
-    question: "Is there a way to \"save\" a failed written exam attempt?",
-    answer: "Yes, for written exams, you may apply for a final oral assessment to attempt to redeem the grade to a 4.0 (the lowest pass). Crucially, this oral assessment does not constitute a resit; its purpose is to save the current attempt. However, you can only use this option three times total during your entire degree and only once per module, therefore, use them wisely :)"
+    question: "What happens if I fail a subject after all four attempts?",
+    answer: "If you exhaust all resits without success (all four attempts), the examination is deemed \"conclusively unsuccessful\" (endgültig nicht bestanden), which typically disqualifies you from continuing the MEC program."
   },
   {
     question: "Is class attendance mandatory? What is the minimum attendance requirement?",

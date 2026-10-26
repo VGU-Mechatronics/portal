@@ -131,7 +131,7 @@ import {
 export interface SearchItem {
   title: string;
   description?: string;
-  type: 'PDF' | 'LINK' | 'DRIVE' | 'FORM' | 'EXCEL' | 'DOCX' | 'FAQ';
+  type: 'LINK' | 'FORM' | 'FAQ';
   category: string;
   url?: string;
 }
@@ -173,25 +173,46 @@ const SEARCH_POOL: SearchItem[] = [
     url: '#section-grade-conversion-table'
   },
   {
-    title: 'HAW Hamburg & VGU Examination and Study Regulations (B.Sc. Mechatronics)',
-    description: 'Official 2026 regulations governing 210 ECTS, 3.5-year duration, course attendance ≥80%, 3-day withdrawal, 4-attempt retake limit, 180 ECTS thesis, and degree calculation (80% modules + 20% thesis)',
+    title: 'HAW Hamburg & VGU Examination and Academic Regulations (B.Sc. Mechatronics)',
+    description: 'Official regulations governing 210 CP, 3.5-year duration, Sem 5 Integration Subjects (6 CP), Sem 6 Electives (25 CP), M1-M12 progression gatekeeper, 80% attendance, max 4 attempts, 180 CP Bachelor Thesis, and Absence & Withdrawal Protocol',
     type: 'LINK' as const,
     category: 'Academic Regulations',
     url: '#official-regulations-container'
   },
   {
-    title: 'Retake Exam Regulations (§ 20 & § 27)',
-    description: 'No retakes for passed modules, maximum 3 retakes (4 total attempts), conclusively unsuccessful dismissal, and cumulative failed attempts tracking',
+    title: 'Progression Gatekeeper: Modules M1 to M12 Requirement',
+    description: 'Successful completion of M1 to M12 is a mandatory prerequisite for participation in courses and admission to examinations for third-year modules (M25 to M44) and the Practical Module',
     type: 'LINK' as const,
     category: 'Academic Regulations',
-    url: '#section-retake-exams-regulations'
+    url: '#section-progression-prereq'
   },
   {
-    title: 'Oral Supplementary Examination',
-    description: 'Grade rescue opportunity for failed written or take-home exams (5.0 to 4.0), max 1/module & 3/degree, written application within 4 weeks',
+    title: 'Compulsory Attendance Policy (80% Weekly Semester Hours)',
+    description: 'Compulsory attendance for Seminar (S), Laboratory course (Prak), and Exercise (Üb). Students must attend at least 80% of weekly semester hours',
     type: 'LINK' as const,
     category: 'Academic Regulations',
-    url: '#section-oral-assessment-regulations'
+    url: '#section-attendance-rules'
+  },
+  {
+    title: 'Retaking Examinations & Max Attempts (4 Attempts Total)',
+    description: 'Passed examinations cannot be retaken. Unpassed exams may be retaken 3 times (4 attempts total). Definitively failed if exhausted. At least 1 exam per semester',
+    type: 'LINK' as const,
+    category: 'Academic Regulations',
+    url: '#section-retakes'
+  },
+  {
+    title: 'Bachelor Thesis with Final Colloquium (Module M46 - 180 CP)',
+    description: 'Prerequisite 180 CP, 15 CP total (12 CP written + 3 CP colloquium). Written in English, 2 examiners, colloquium within 10 weeks of submission, max 6 weeks extension for good cause',
+    type: 'LINK' as const,
+    category: 'Academic Regulations',
+    url: '#section-bachelor-thesis'
+  },
+  {
+    title: 'Absence and Withdrawal from Examinations',
+    description: 'Unexcused absence results in 5.0 (unsatisfactory) / failed. Valid reasons and medical certificates submitted without delay result in attempt deemed not to have taken place',
+    type: 'LINK' as const,
+    category: 'Academic Regulations',
+    url: '#section-exam-registration-absence'
   },
   ...FORM_CARDS.map(c => ({ ...c, category: 'Forms & Petitions' as string })),
   ...EXAM_CARDS.map(c => ({ ...c, category: 'Exam Administrative Forms' as string })),
@@ -213,9 +234,9 @@ const SEARCH_POOL: SearchItem[] = [
     url: '#basic-internship-email-regulations'
   },
   {
-    title: 'HAW Mechatronik Vorpraxis Richtlinie (PDF)',
+    title: 'HAW Mechatronik Vorpraxis Richtlinie',
     description: 'Official HAW Hamburg Basic Internship Regulations (HAW_Mechatronik_Vorpraxis_Richtlinie en-GB.pdf) attached to program announcement',
-    type: 'PDF' as const,
+    type: 'LINK' as const,
     category: 'Basic Internship',
     url: DUMMY_DRIVE_URL
   },
@@ -620,53 +641,25 @@ export default function App() {
     "Core Engineering Curriculum Overview".toLowerCase().includes(query) ||
     "The Mechatronics program is meticulously aligned with HAW Hamburg accreditation standards. It spans over 4 academic years (7-8 semesters), covering fundamental sciences, electrical systems, control loops, and robotics, culminating in a dual-degree Bachelor of Science award.".toLowerCase().includes(query) ||
     "Year 1 Foundations Maths, Physics, Electronics, CAD Drafting Year 2 Core Engineering Signals, Sensors, Fluidics, Manufacturing Labs Year 3 Advanced Systems Embedded Controllers, Robotics, PLC, DSP Year 4 Specialization Thesis, Elective Modules, Professional Internship".toLowerCase().includes(query);
-
-  const foundationTransitionMatches = !query ||
-    "quy định để từ Foundation lên ngành (Semester 1)".toLowerCase().includes(query) ||
-    "quy định chuyển tiếp từ Foundation lên chuyên ngành (Semester 1)".toLowerCase().includes(query) ||
-    "IELTS 6.0 (nộp về VGU ASA trước 15.08)".toLowerCase().includes(query) ||
-    "passed >= 80% ECTS in the Foundation Semester".toLowerCase().includes(query) ||
-    "to progress to semester 4, students must fully complete the Basic Internship".toLowerCase().includes(query) ||
-    "Basic Internship".toLowerCase().includes(query) ||
-    "semester 4 progression".toLowerCase().includes(query) ||
-    "VGU ASA by 15.08".toLowerCase().includes(query);
-
   const officialRegulationsMatches = !query ||
     "examination and study regulations for the bachelor's degree programme in mechatronics b.sc. haw hamburg vgu".toLowerCase().includes(query) ||
     "quy chế đào tạo và thi cử mechatronics".toLowerCase().includes(query) ||
-    "attendance compulsory 80% chuyên cần".toLowerCase().includes(query) ||
-    "withdrawal deadline 3 calendar days hủy thi rút thi".toLowerCase().includes(query) ||
-    "bachelor thesis 180 ects khóa luận tốt nghiệp bảo vệ colloquium".toLowerCase().includes(query) ||
-    "practical module main placement 14 weeks thực tập chính".toLowerCase().includes(query) ||
-    "gatekeeper 3rd year m1 m12 50 ects tiền điều kiện".toLowerCase().includes(query) ||
-    "academic advising tư vấn học tập exmatriculation thôi học".toLowerCase().includes(query) ||
-    "grading scale 1.0 4.0 5.0 thang điểm đức".toLowerCase().includes(query) ||
-    "overall mark 80% 20% điểm tốt nghiệp xếp loại".toLowerCase().includes(query) ||
-    "appeals inspection of records khiếu nại phúc khảo".toLowerCase().includes(query) ||
-    "online examinations written exams prohibited thi online".toLowerCase().includes(query);
+    "210 credit points 3.5 years seven semesters b.sc. haw hamburg".toLowerCase().includes(query) ||
+    "fifth semester integration subjects 6 credit points forfeited".toLowerCase().includes(query) ||
+    "sixth semester compulsory elective modules 5 modules 25 cp specialisation".toLowerCase().includes(query) ||
+    "prerequisite m1 to m12 third year modules m25 to m44".toLowerCase().includes(query) ||
+    "seventh semester practical module 15 cp 14-week industrial placement".toLowerCase().includes(query) ||
+    "attendance compulsory 80% seminar laboratory course exercise chuyên cần".toLowerCase().includes(query) ||
+    "75% direct lecture hours moodle cấm thi exam eligibility".toLowerCase().includes(query) ||
+    "registration binding withdrawal absence medical certificate giấy bác sĩ".toLowerCase().includes(query) ||
+    "retake exam regulations no retakes passed modules max 3 retakes 4 attempts".toLowerCase().includes(query) ||
+    "học lại học phần sau 2 lần thi không đạt đóng học phí tín chỉ".toLowerCase().includes(query) ||
+    "gian lận thi cử lần 1 fail lần 2 buộc defer 1 năm lần 3 đuổi học".toLowerCase().includes(query) ||
+    "bảo lưu deferral tối đa 2 năm 4 kỳ phòng đào tạo công tác sinh viên".toLowerCase().includes(query) ||
+    "bachelor thesis 180 cp 15 cp written 12 cp colloquium 3 cp 10 weeks 6 weeks extension".toLowerCase().includes(query) ||
+    "thang điểm đức 1.0 đến 5.0 pass 1.0 4.0 fail 5.0 gpa formula làm tròn 1 số thập phân".toLowerCase().includes(query) ||
+    "học bổng khóa 2025 top 5% a 100% b 50% c 25% gpa 2.30 ielts 6.0 daad wus điều 10".toLowerCase().includes(query);
 
-  const retakeRegulationsMatches = !query ||
-    "quy định về thi lại (retake exams)".toLowerCase().includes(query) ||
-    "retake exam regulations wiederholungsprüfungen".toLowerCase().includes(query) ||
-    "no retakes for passed modules".toLowerCase().includes(query) ||
-    "maximum number of retakes max 3 retakes 4 attempts".toLowerCase().includes(query) ||
-    "conclusively unsuccessful endgültig nicht bestanden".toLowerCase().includes(query) ||
-    "cumulative tracking of failed attempts".toLowerCase().includes(query) ||
-    "oral supplementary examination mündliche ergänzungsprüfung".toLowerCase().includes(query) ||
-    "grade rescue objective 5.0 to 4.0 sufficient".toLowerCase().includes(query) ||
-    "not counted as a retake attempt".toLowerCase().includes(query) ||
-    "frequency lifetime limits 3 times bachelor".toLowerCase().includes(query) ||
-    "written application deadline 4 weeks".toLowerCase().includes(query) ||
-    "exclusion criteria academic misconduct cheating disruption".toLowerCase().includes(query) ||
-    "thi lại retake không thi lại môn đã đỗ".toLowerCase().includes(query) ||
-    "số lần thi lại tối đa 3 lần tổng cộng 4 cơ hội".toLowerCase().includes(query) ||
-    "đánh giá trượt vĩnh viễn conclusively unsuccessful endgültig không đạt".toLowerCase().includes(query) ||
-    "tính gộp số lần trượt haw hamburg".toLowerCase().includes(query) ||
-    "vấn đáp bổ sung cứu điểm trượt oral assessment mündliche ergänzungsprüfung".toLowerCase().includes(query) ||
-    "cứu điểm trượt 5.0 nâng lên 4.0 sufficient".toLowerCase().includes(query) ||
-    "không tính là một lần thi lại tối đa 1 lần mỗi môn 3 lần cả chương trình bachelor".toLowerCase().includes(query) ||
-    "thời hạn nộp đơn 4 tuần thời lượng 15 đến 45 phút".toLowerCase().includes(query) ||
-    "trường hợp loại trừ gian lận quay cóp gây rối".toLowerCase().includes(query);
 
   const thesisOverviewMatches = !query ||
     "Bachelor Thesis Guidelines".toLowerCase().includes(query) ||
@@ -744,8 +737,7 @@ export default function App() {
        filteredIndustrialPlacementCards.length + filteredGraduationCards.length + filteredScholarshipCards.length + 
        filteredExchangeCards.length + filteredFaqItems.length + (curriculumOverviewMatches ? 1 : 0) +
        (officialRegulationsMatches ? 1 : 0) +
-       (foundationTransitionMatches ? 1 : 0) + (retakeRegulationsMatches ? 1 : 0) +
-       (scholarshipOverviewMatches ? 1 : 0) + (gradeConversionMatches ? 1 : 0) + 
+       (scholarshipOverviewMatches ? 1 : 0) + 
        (basicInternshipMatches ? 1 : 0) + (industrialPlacementMatches ? 1 : 0))
     : 0;
 
@@ -759,7 +751,7 @@ export default function App() {
       case 'curriculum':
         return filteredCurriculumCards.length + (curriculumOverviewMatches ? 1 : 0);
       case 'regulations':
-        return filteredRegulationCards.length + (officialRegulationsMatches ? 1 : 0) + (foundationTransitionMatches ? 1 : 0) + (retakeRegulationsMatches ? 1 : 0) + (gradeConversionMatches ? 1 : 0);
+        return filteredRegulationCards.length + (officialRegulationsMatches ? 1 : 0);
       case 'forms':
         return filteredFormCards.length;
       case 'internship-thesis':
@@ -1349,11 +1341,9 @@ export default function App() {
                                     <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
                                       item.type === 'FORM' 
                                         ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' 
-                                        : item.type === 'PDF'
-                                        ? 'bg-red-500/10 text-red-500 border border-red-500/20'
                                         : item.type === 'FAQ'
-                                        ? 'bg-blue-500/10 text-blue-500 border border-blue-500/20'
-                                        : 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
+                                        ? 'bg-purple-500/10 text-purple-500 border border-purple-500/20'
+                                        : 'bg-sky-500/10 text-sky-500 border border-sky-500/20'
                                     }`}>
                                       {item.type}
                                     </span>
@@ -2934,417 +2924,7 @@ export default function App() {
               {/* 4. REGULATIONS */}
               {activeTab === 'regulations' && (
                 <div className="space-y-8" id="section-regulations">
-                  {/* Comprehensive Official Examination & Study Regulations (2026) */}
-                  {(officialRegulationsMatches || !query) && (
-                    <MecRegulationsOfficial darkMode={darkMode} searchQuery={query} />
-                  )}
-
-                  {/* Official Regulations & Policies */}
-                  {(foundationTransitionMatches || retakeRegulationsMatches || filteredRegulationCards.length > 0) && (
-                    <div className="space-y-4">
-                      <div className="flex items-center space-x-2">
-                        <ShieldAlert className="w-5 h-5 text-orange-500" />
-                        <h2 className={`text-base font-extrabold tracking-tight ${
-                          darkMode ? 'text-slate-200' : 'text-slate-800'
-                        }`}>
-                          Key Academic Policies & Transition Rules
-                        </h2>
-                      </div>
-
-                      {foundationTransitionMatches && (
-                        <div className={`p-6 rounded-2xl border transition-all duration-300 relative overflow-hidden ${
-                          darkMode 
-                            ? 'bg-slate-900/40 border-slate-800 backdrop-blur-xl' 
-                            : 'bg-white border-slate-200 shadow-sm'
-                        }`}>
-                          <div className="absolute top-0 left-0 w-1.5 h-full bg-orange-500" />
-                          <div className="pl-2">
-                            <h3 className={`text-base font-extrabold mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                              Academic Transition & Progression Regulations
-                            </h3>
-                            <p className={`text-xs leading-relaxed mb-5 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                              To qualify for academic progression into subsequent semesters of the Mechatronics (MEC) program, students must successfully fulfill all of the following mandatory regulatory conditions:
-                            </p>
-                            
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-                              {/* IELTS Requirement Card */}
-                              <div className={`p-4 rounded-xl border flex flex-col justify-between transition-all duration-300 ${
-                                darkMode 
-                                  ? 'bg-slate-950/40 border-slate-900/80 hover:border-orange-500/20' 
-                                  : 'bg-slate-50/50 border-slate-150 shadow-xs hover:border-orange-500/30'
-                              }`}>
-                                <div>
-                                  <div className="flex items-center justify-between mb-2">
-                                    <span className="px-2 py-0.5 text-[10px] font-mono font-bold uppercase rounded bg-orange-500/10 text-orange-500 border border-orange-500/15">
-                                      Language Proficiency
-                                    </span>
-                                    <span className="text-[10px] font-semibold text-rose-500 font-mono">Deadline: 15.08</span>
-                                  </div>
-                                  <h4 className={`font-bold text-sm mb-1.5 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
-                                    IELTS 6.0 Certificate
-                                  </h4>
-                                  <p className={`leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                                    Students must achieve a minimum English proficiency of <strong className="text-orange-500">IELTS 6.0</strong> and submit a valid certificate copy directly to the <strong className="text-slate-900 dark:text-white">VGU ASA</strong> office no later than <strong className="border-b border-rose-400/40 text-rose-500">15.08</strong>.
-                                  </p>
-                                </div>
-                              </div>
-
-                              {/* ECTS Academic Requirement Card */}
-                              <div className={`p-4 rounded-xl border flex flex-col justify-between transition-all duration-300 ${
-                                darkMode 
-                                  ? 'bg-slate-950/40 border-slate-900/80 hover:border-orange-500/20' 
-                                  : 'bg-slate-50/50 border-slate-150 shadow-xs hover:border-orange-500/30'
-                              }`}>
-                                <div>
-                                  <div className="flex items-center justify-between mb-2">
-                                    <span className="px-2 py-0.5 text-[10px] font-mono font-bold uppercase rounded bg-emerald-500/10 text-emerald-500 border border-emerald-500/15">
-                                      Academic Progress
-                                    </span>
-                                    <span className="text-[10px] font-semibold text-emerald-500 font-mono">Passed &ge; 80% ECTS</span>
-                                  </div>
-                                  <h4 className={`font-bold text-sm mb-1.5 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
-                                    Complete &ge; 80% ECTS
-                                  </h4>
-                                  <p className={`leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                                    Successfully pass a minimum of <strong className="text-emerald-500">&ge; 80% of total Credit Points (ECTS)</strong> required in the Foundation Semester curriculum. All component exams and coursework must have registered final grades.
-                                  </p>
-                                </div>
-                              </div>
-
-                              {/* Basic Internship Requirement Card */}
-                              <div className={`p-4 rounded-xl border flex flex-col justify-between transition-all duration-300 ${
-                                darkMode 
-                                  ? 'bg-slate-950/40 border-slate-900/80 hover:border-orange-500/20' 
-                                  : 'bg-slate-50/50 border-slate-150 shadow-xs hover:border-orange-500/30'
-                              }`}>
-                                <div>
-                                  <div className="flex items-center justify-between mb-2">
-                                    <span className="px-2 py-0.5 text-[10px] font-mono font-bold uppercase rounded bg-blue-500/10 text-blue-500 border border-blue-500/15">
-                                      Progression Standard
-                                    </span>
-                                    <span className="text-[10px] font-semibold text-blue-500 font-mono">S4 Requirement</span>
-                                  </div>
-                                  <h4 className={`font-bold text-sm mb-1.5 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
-                                    Basic Internship Completion
-                                  </h4>
-                                  <p className={`leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                                    To qualify for progression into <strong className="text-blue-500">Semester 4</strong> of the curriculum, students must <strong className="text-blue-500">fully complete</strong> and obtain satisfactory grade verification for their Basic Internship block.
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Examination Retakes & Oral Supplementary Assessment Regulations */}
-                      {retakeRegulationsMatches && (
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" id="section-regulations-retake-oral-wrapper">
-                          {/* 1. Retake Exam Regulations (Wiederholungsprüfungen) */}
-                          <div 
-                            id="section-retake-exams-regulations"
-                            className={`p-6 rounded-2xl border transition-all duration-300 relative overflow-hidden flex flex-col justify-between ${
-                              darkMode 
-                                ? 'bg-slate-900/40 border-slate-800 backdrop-blur-xl' 
-                                : 'bg-white border-slate-200 shadow-sm'
-                            }`}
-                          >
-                            <div className="absolute top-0 left-0 w-1.5 h-full bg-rose-500" />
-                            <div className="pl-2">
-                              <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-                                <div className="flex items-center space-x-2">
-                                  <div className={`p-1.5 rounded-lg ${darkMode ? 'bg-rose-500/15 text-rose-400' : 'bg-rose-50 text-rose-600'}`}>
-                                    <RotateCcw className="w-4 h-4" />
-                                  </div>
-                                  <h3 className={`text-base font-extrabold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                                    Retake Exam Regulations
-                                  </h3>
-                                </div>
-                                <span className="px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase rounded bg-rose-500/10 text-rose-500 border border-rose-500/20">
-                                  Max 3 Retakes (4 Attempts)
-                                </span>
-                              </div>
-                              <p className={`text-xs leading-relaxed mb-4 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                                Mandatory examination progression policies governing all Mechatronics (MEC) students under the official regulatory framework:
-                              </p>
-
-                              <div className="space-y-3 text-xs">
-                                {/* Item 1: No Retakes for Passed Modules */}
-                                <div className={`p-3.5 rounded-xl border transition-all ${
-                                  darkMode 
-                                    ? 'bg-slate-950/40 border-slate-900/80 hover:border-slate-800' 
-                                    : 'bg-slate-50/70 border-slate-200/70 hover:border-slate-300'
-                                }`}>
-                                  <div className="flex items-start space-x-2.5">
-                                    <div className="mt-0.5 flex-shrink-0 text-rose-500">
-                                      <Ban className="w-4 h-4" />
-                                    </div>
-                                    <div>
-                                      <h4 className={`font-bold mb-1 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
-                                        No Retakes for Passed Modules (§ 20(1))
-                                      </h4>
-                                      <p className={`leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-                                        Once you have passed a module examination, you are <strong className="text-rose-500 font-semibold">not permitted to re-register or retake</strong> it to improve your grade <em>(with a limited exception specifically governing Bachelor Thesis re-submission)</em>.
-                                      </p>
-                                    </div>
-                                  </div>
-                                </div>
-
-                                {/* Item 2: Maximum Number of Retakes */}
-                                <div className={`p-3.5 rounded-xl border transition-all ${
-                                  darkMode 
-                                    ? 'bg-slate-950/40 border-slate-900/80 hover:border-slate-800' 
-                                    : 'bg-slate-50/70 border-slate-200/70 hover:border-slate-300'
-                                }`}>
-                                  <div className="flex items-start space-x-2.5">
-                                    <div className="mt-0.5 flex-shrink-0 text-amber-500">
-                                      <RotateCcw className="w-4 h-4" />
-                                    </div>
-                                    <div>
-                                      <h4 className={`font-bold mb-1 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
-                                        Maximum Number of Retakes (§ 20(2))
-                                      </h4>
-                                      <p className={`leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-                                        For each examination or module component evaluated as failed on the first attempt, you are permitted <strong className="text-amber-500 font-semibold">a maximum of 3 retakes</strong> <em>(providing a total of <strong className="text-slate-900 dark:text-white font-semibold">up to 4 exam attempts</strong> per module)</em>.
-                                      </p>
-                                    </div>
-                                  </div>
-                                </div>
-
-                                {/* Item 3: Conclusively Unsuccessful */}
-                                <div className={`p-3.5 rounded-xl border transition-all ${
-                                  darkMode 
-                                    ? 'bg-rose-950/20 border-rose-900/40 hover:border-rose-900/60' 
-                                    : 'bg-rose-50/60 border-rose-200/80 hover:border-rose-300'
-                                }`}>
-                                  <div className="flex items-start space-x-2.5">
-                                    <div className="mt-0.5 flex-shrink-0 text-rose-600 dark:text-rose-400">
-                                      <AlertTriangle className="w-4 h-4" />
-                                    </div>
-                                    <div>
-                                      <div className="flex items-center space-x-2 mb-1">
-                                        <h4 className={`font-bold ${darkMode ? 'text-rose-300' : 'text-rose-900'}`}>
-                                          Conclusively Unsuccessful
-                                        </h4>
-                                      </div>
-                                      <p className={`leading-relaxed ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
-                                        If you have exhausted both retake attempts and still fail, the module is designated as <strong className="text-rose-600 dark:text-rose-400 font-bold">&quot;conclusively unsuccessful&quot;</strong>. This legally deprives you of examination rights and results in <strong className="text-rose-600 dark:text-rose-400 underline font-bold">mandatory academic dismissal (exmatriculation)</strong> from the MEC program.
-                                      </p>
-                                    </div>
-                                  </div>
-                                </div>
-
-                                {/* Item 4: Cumulative Tracking of Failed Attempts */}
-                                <div className={`p-3.5 rounded-xl border transition-all ${
-                                  darkMode 
-                                    ? 'bg-slate-950/40 border-slate-900/80 hover:border-slate-800' 
-                                    : 'bg-slate-50/70 border-slate-200/70 hover:border-slate-300'
-                                }`}>
-                                  <div className="flex items-start space-x-2.5">
-                                    <div className="mt-0.5 flex-shrink-0 text-blue-500">
-                                      <History className="w-4 h-4" />
-                                    </div>
-                                    <div>
-                                      <h4 className={`font-bold mb-1 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
-                                        Cumulative Tracking of Failed Attempts
-                                      </h4>
-                                      <p className={`leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-                                        When transferring universities or switching degree programs within HAW Hamburg, failed attempts from equivalent modules previously undertaken <strong className="text-blue-500 font-semibold">are cumulatively counted toward your maximum allowable attempts</strong>.
-                                      </p>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* 2. Oral Supplementary Examination */}
-                          <div 
-                            id="section-oral-assessment-regulations"
-                            className={`p-6 rounded-2xl border transition-all duration-300 relative overflow-hidden flex flex-col justify-between ${
-                              darkMode 
-                                ? 'bg-slate-900/40 border-slate-800 backdrop-blur-xl' 
-                                : 'bg-white border-slate-200 shadow-sm'
-                            }`}
-                          >
-                            <div className="absolute top-0 left-0 w-1.5 h-full bg-sky-500" />
-                            <div className="pl-2">
-                              <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-                                <div className="flex items-center space-x-2">
-                                  <div className={`p-1.5 rounded-lg ${darkMode ? 'bg-sky-500/15 text-sky-400' : 'bg-sky-50 text-sky-600'}`}>
-                                    <MessageSquare className="w-4 h-4" />
-                                  </div>
-                                  <h3 className={`text-base font-extrabold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                                    Oral Supplementary Examination
-                                  </h3>
-                                </div>
-                                <span className="px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase rounded bg-sky-500/10 text-sky-500 border border-sky-500/20">
-                                  Oral Assessment (5.0 &rarr; 4.0)
-                                </span>
-                              </div>
-                              <p className={`text-xs leading-relaxed mb-4 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                                Regulatory provisions governing oral supplementary exams to rescue an unsatisfactory exam result:
-                              </p>
-
-                              <div className="space-y-3 text-xs">
-                                {/* Point 1: Purpose & Grade Rescue */}
-                                <div className={`p-3.5 rounded-xl border transition-all ${
-                                  darkMode 
-                                    ? 'bg-slate-950/40 border-slate-900/80 hover:border-slate-800' 
-                                    : 'bg-slate-50/70 border-slate-200/70 hover:border-slate-300'
-                                }`}>
-                                  <div className="flex items-start space-x-2.5">
-                                    <div className="mt-0.5 flex-shrink-0 text-sky-500">
-                                      <Award className="w-4 h-4" />
-                                    </div>
-                                    <div>
-                                      <h4 className={`font-bold mb-1 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
-                                        Grade Rescue Objective (5.0 &rarr; 4.0)
-                                      </h4>
-                                      <p className={`leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-                                        An academic rescue opportunity exclusively for examinations administered as a <strong className="text-slate-900 dark:text-white font-semibold">written exam</strong> or <strong className="text-slate-900 dark:text-white font-semibold">take-home paper</strong> evaluated as failed (grade 5.0). The oral assessment outcome determines solely whether the failing grade (5.0) remains unchanged or is <strong className="text-sky-500 font-semibold">raised to the minimum passing grade of 4.0 (Sufficient)</strong>.
-                                      </p>
-                                    </div>
-                                  </div>
-                                </div>
-
-                                {/* Point 2 & 3: Not Counted as Retake & Limits */}
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                  <div className={`p-3.5 rounded-xl border transition-all ${
-                                    darkMode 
-                                      ? 'bg-slate-950/40 border-slate-900/80 hover:border-slate-800' 
-                                      : 'bg-slate-50/70 border-slate-200/70 hover:border-slate-300'
-                                  }`}>
-                                    <div className="flex items-start space-x-2.5">
-                                      <div className="mt-0.5 flex-shrink-0 text-emerald-500">
-                                        <CheckCircle2 className="w-4 h-4" />
-                                      </div>
-                                      <div>
-                                        <h4 className={`font-bold mb-1 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
-                                          Not Counted as a Retake Attempt
-                                        </h4>
-                                        <p className={`leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-                                          Legally treated as a component of the current exam attempt to rescue the grade; therefore, it <strong className="text-emerald-500 font-semibold">is not deducted from your resit quota</strong>.
-                                        </p>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <div className={`p-3.5 rounded-xl border transition-all ${
-                                    darkMode 
-                                      ? 'bg-slate-950/40 border-slate-900/80 hover:border-slate-800' 
-                                      : 'bg-slate-50/70 border-slate-200/70 hover:border-slate-300'
-                                  }`}>
-                                    <div className="flex items-start space-x-2.5">
-                                      <div className="mt-0.5 flex-shrink-0 text-amber-500">
-                                        <Clock className="w-4 h-4" />
-                                      </div>
-                                      <div>
-                                        <h4 className={`font-bold mb-1 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
-                                          Lifetime & Frequency Limits
-                                        </h4>
-                                        <p className={`leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-                                          Permitted a maximum of <strong className="text-amber-500 font-semibold">1 time</strong> per module, and a cumulative total of <strong className="text-amber-500 font-semibold">no more than 3 times</strong> throughout the entire Bachelor degree program.
-                                        </p>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-
-                                {/* Point 4 & 5: Application Deadline & Duration */}
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                  <div className={`p-3.5 rounded-xl border transition-all ${
-                                    darkMode 
-                                      ? 'bg-slate-950/40 border-slate-900/80 hover:border-slate-800' 
-                                      : 'bg-slate-50/70 border-slate-200/70 hover:border-slate-300'
-                                  }`}>
-                                    <div className="flex items-start space-x-2.5">
-                                      <div className="mt-0.5 flex-shrink-0 text-blue-500">
-                                        <Calendar className="w-4 h-4" />
-                                      </div>
-                                      <div>
-                                        <h4 className={`font-bold mb-1 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
-                                          Application Deadline
-                                        </h4>
-                                        <p className={`leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-                                          A formal written petition must be submitted to the MEC program within <strong className="text-blue-500 font-semibold">4 weeks</strong> of official grade announcement <em>(official semester breaks are excluded from this window)</em>.
-                                        </p>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <div className={`p-3.5 rounded-xl border transition-all ${
-                                    darkMode 
-                                      ? 'bg-slate-950/40 border-slate-900/80 hover:border-slate-800' 
-                                      : 'bg-slate-50/70 border-slate-200/70 hover:border-slate-300'
-                                  }`}>
-                                    <div className="flex items-start space-x-2.5">
-                                      <div className="mt-0.5 flex-shrink-0 text-indigo-500">
-                                        <Clock className="w-4 h-4" />
-                                      </div>
-                                      <div>
-                                        <h4 className={`font-bold mb-1 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
-                                          Examination Duration
-                                        </h4>
-                                        <p className={`leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-                                          Conducted as an oral examination lasting between <strong className="text-indigo-500 font-semibold">15 and 45 minutes</strong> directly before the academic examination panel.
-                                        </p>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-
-                                {/* Point 6: Exclusion Criteria */}
-                                <div className={`p-3.5 rounded-xl border transition-all ${
-                                  darkMode 
-                                    ? 'bg-rose-950/15 border-rose-900/30' 
-                                    : 'bg-rose-50/40 border-rose-200/60'
-                                }`}>
-                                  <div className="flex items-start space-x-2.5">
-                                    <div className="mt-0.5 flex-shrink-0 text-rose-500">
-                                      <XCircle className="w-4 h-4" />
-                                    </div>
-                                    <div>
-                                      <h4 className={`font-bold mb-1 ${darkMode ? 'text-rose-300' : 'text-rose-800'}`}>
-                                        Exclusion Criteria
-                                      </h4>
-                                      <p className={`leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-                                        You <strong className="text-rose-500 font-semibold">are strictly disqualified</strong> from applying for an oral supplementary exam if the 5.0 grade resulted from <strong className="text-rose-500">academic misconduct (cheating)</strong>, <strong className="text-rose-500">examination room disruption</strong>, or <strong className="text-rose-500">unexcused absence</strong>.
-                                      </p>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {filteredRegulationCards.length > 0 && (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-5" id="regulation-cards-grid">
-                          {filteredRegulationCards.map((card, idx) => (
-                            <PortalCardComponent key={idx} card={card} darkMode={darkMode} />
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Part C: German - Vietnamese Grade Conversion Scale (Article 19) */}
-                  {(gradeConversionMatches || !query) && (
-                    <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-850 scroll-mt-28 md:scroll-mt-36" id="section-grade-conversion-wrapper">
-                      <div className="flex items-center space-x-2">
-                        <Scale className="w-5 h-5 text-orange-500" />
-                        <h2 className={`text-base font-extrabold tracking-tight ${
-                          darkMode ? 'text-slate-200' : 'text-slate-800'
-                        }`}>
-                          Grading System & Conversion Standards
-                        </h2>
-                      </div>
-
-                      <GradeConversionTable darkMode={darkMode} searchQuery={query} />
-                    </div>
-                  )}
+                  <MecRegulationsOfficial darkMode={darkMode} searchQuery={query} />
                 </div>
               )}
 
@@ -4627,7 +4207,7 @@ export default function App() {
                 Need help? Email the program office or come to <span className="font-extrabold text-slate-950 dark:text-white border-b border-orange-500/30 pb-0.5">Building 5, Room 527</span>.
               </p>
               <p className="font-mono text-[10.5px] font-bold tracking-wider text-slate-600 dark:text-slate-400 uppercase" id="footer-version-stamp">
-                Last updated: September 2026
+                Last updated: October 2026
               </p>
             </div>
           </div>

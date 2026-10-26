@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { ArrowUpRight, FileText, Link, Database, FileSpreadsheet, AlertTriangle } from 'lucide-react';
+import { ArrowUpRight, Link, AlertTriangle } from 'lucide-react';
 import { PortalCard } from '../data/mecPortalData';
 
 interface PortalCardComponentProps {
@@ -14,44 +14,28 @@ interface PortalCardComponentProps {
 }
 
 export default function PortalCardComponent({ card, darkMode }: PortalCardComponentProps) {
-  // Determine badge colors based on document types
+  // Determine badge colors based on document types (only FORM and LINK)
   const getBadgeStyles = (type: string) => {
     switch (type) {
-      case 'PDF':
-        return darkMode
-          ? 'bg-rose-500/10 text-rose-400 border-rose-500/20'
-          : 'bg-rose-50 text-rose-600 border-rose-200';
       case 'FORM':
         return darkMode
           ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
           : 'bg-amber-50 text-amber-600 border-amber-200';
-      case 'DRIVE':
-        return darkMode
-          ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-          : 'bg-emerald-50 text-emerald-600 border-emerald-200';
       case 'LINK':
+      default:
         return darkMode
           ? 'bg-sky-500/10 text-sky-400 border-sky-500/20'
           : 'bg-sky-50 text-sky-600 border-sky-200';
-      default:
-        return darkMode
-          ? 'bg-slate-500/10 text-slate-400 border-slate-500/20'
-          : 'bg-slate-100 text-slate-600 border-slate-200';
     }
   };
 
   const getIconForType = (type: string) => {
     switch (type) {
-      case 'PDF':
-        return <FileText className="w-4 h-4" />;
       case 'FORM':
         return <AlertTriangle className="w-4 h-4" />;
-      case 'DRIVE':
-        return <Database className="w-4 h-4" />;
       case 'LINK':
-        return <Link className="w-4 h-4" />;
       default:
-        return <FileText className="w-4 h-4" />;
+        return <Link className="w-4 h-4" />;
     }
   };
 
@@ -63,6 +47,11 @@ export default function PortalCardComponent({ card, darkMode }: PortalCardCompon
       onClick={(e) => {
         if (card.isTba) {
           e.preventDefault();
+          return;
+        }
+        if (card.onClick) {
+          e.preventDefault();
+          card.onClick();
           return;
         }
         if (card.url && (card.url.includes('drive.google.com') || card.url.includes('docs.google.com'))) {
@@ -147,7 +136,7 @@ export default function PortalCardComponent({ card, darkMode }: PortalCardCompon
               ? (darkMode ? 'text-slate-500' : 'text-slate-400')
               : (darkMode ? 'text-slate-500 group-hover:text-orange-400' : 'text-slate-400 group-hover:text-orange-500')
           }`}>
-            {card.isTba ? '[TBA]' : 'Open Document'}
+            {card.isTba ? '[TBA]' : (card.actionLabel || 'Open Document')}
           </span>
           {!card.isTba && <span className="text-orange-500 text-xs transition-transform duration-300 group-hover:translate-x-1">→</span>}
         </div>
