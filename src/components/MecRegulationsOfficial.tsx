@@ -184,15 +184,16 @@ export default function MecRegulationsOfficial({ darkMode, searchQuery = '' }: M
           </div>
 
           {/* Action Buttons */}
-          {/* Action Button: Single Direct Download */}
+          {/* Action Button: View Regulation Document via Google Drive */}
           <div className="flex items-center flex-shrink-0">
             <a
-              href={pdfUrl}
-              download="PSO_Mechatronics_Regulations_2026.pdf"
+              href="https://drive.google.com/file/d/1LR8xRWrSVclKdevOM1EJMm6GMObrYxRq/view?usp=sharing"
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2.5 px-5 py-3 rounded-xl bg-orange-500 hover:bg-orange-600 active:scale-98 text-white font-bold text-xs sm:text-sm shadow-md shadow-orange-500/20 transition-all cursor-pointer"
             >
-              <Download className="w-4 h-4" />
-              <span>Download PDF Document</span>
+              <ExternalLink className="w-4 h-4" />
+              <span>View Regulation Document</span>
             </a>
           </div>
         </div>
