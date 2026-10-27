@@ -47,7 +47,7 @@ export const EXAM_CARDS: PortalCard[] = [
     title: "Exam Attendence List_WS2026",
     description: "Official finalized examination attendance roster and student room assignments for Winter Semester 2026.",
     type: "LINK",
-    url: "https://docs.google.com/spreadsheets/d/17Gwpw-hVJhoRx8oESlUeByeqK7_cSKhzZcbMPIZrhu4/edit?gid=2044431821#gid=2044431821"
+    url: "https://docs.google.com/spreadsheets/d/1gMKMvfgy2_ygVTduvGdhNtK_TS59lJ4LWuQhk7CJIeM/edit?usp=drivesdk"
   },
   {
     title: "Exam Inspection Request",
