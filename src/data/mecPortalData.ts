@@ -33,7 +33,7 @@ export const PORTAL_TABS = [
   { id: 'guidelines', label: 'Guidelines', icon: 'BookOpen', isTba: false, isLocked: false },
   { id: 'schedules-exams', label: 'Schedules & Exams', icon: 'Calendar', isTba: false, isLocked: false },
   { id: 'curriculum', label: 'Curriculum', icon: 'Cpu', isTba: false, isLocked: false },
-  { id: 'regulations', label: 'Regulations', icon: 'ShieldAlert', isTba: false, isLocked: false },
+  { id: 'regulations', label: 'Regulations (HAW)', icon: 'Scale', isTba: false, isLocked: false },
   { id: 'forms', label: 'Forms', icon: 'ClipboardList', isTba: false, isLocked: false },
   { id: 'internship-thesis', label: 'Internship & Bachelor Thesis', icon: 'GraduationCap', isTba: true, isLocked: true },
   { id: 'scholarship-exchange', label: 'Scholarship & Exchange', icon: 'Globe', isTba: true, isLocked: true },
@@ -45,15 +45,13 @@ export type PortalTabId = typeof PORTAL_TABS[number]['id'];
 export const EXAM_CARDS: PortalCard[] = [
   {
     title: "Exam Attendence List_WS2026",
-    description: "Official finalized examination attendance roster and student room assignments for Winter Semester 2026.",
     type: "LINK",
     url: "https://docs.google.com/spreadsheets/d/1gMKMvfgy2_ygVTduvGdhNtK_TS59lJ4LWuQhk7CJIeM/edit?usp=drivesdk"
   },
   {
-    title: "Exam Inspection Request",
-    description: "Request a review of your graded final examination paper within the permitted administrative window.",
+    title: "Exam Paper Review / Exam Inspection Request",
     type: "FORM",
-    url: DUMMY_FORM_URL
+    url: "https://forms.gle/iLsg84B1eP3EXYsh6"
   }
 ];
 
@@ -69,17 +67,10 @@ export interface ArchivedSchedule {
 
 export const SCHEDULE_CARDS: PortalCard[] = [
   {
-    title: "WS2026 Semester Schedule",
+    title: "MEC_Teaching Plan_AY 2026-2027",
     type: "LINK",
-    url: "https://docs.google.com/spreadsheets/d/1Dj9MiKupgDBFr8GGaJIKbt6GlPgVcQELVLam8EGl0cM/edit?gid=218939538#gid=218939538",
+    url: "https://docs.google.com/spreadsheets/d/1Dj9MiKupgDBFr8GGaJIKbt6GlPgVcQELVLam8EGl0cM/edit?usp=sharing",
     statusTag: "Current"
-  },
-  {
-    title: "SS2027 Semester Schedule",
-    type: "LINK",
-    url: "https://docs.google.com/spreadsheets/d/1Dj9MiKupgDBFr8GGaJIKbt6GlPgVcQELVLam8EGl0cM/edit?gid=218939538#gid=218939538",
-    isTba: true,
-    statusTag: "Upcoming"
   }
 ];
 
@@ -138,29 +129,18 @@ export const FORM_CARDS: PortalCard[] = [
   },
   {
     title: "Student Verification & Academic Status Certificates",
-    description: "Official guidelines for students requesting enrollment verification, academic status certificates, and transcripts issued by VGU.",
     type: "LINK",
     url: "https://vgu.edu.vn/vi/students/student-form;jsessionid=E398E24387993A447B51A4A12017B66F/?title=Huong-dan-sinh-vien-hoc-vien-dang-ky-cap-cac-giay-xac-nhan-qua-trinh-hoc-tap-khi-co-nhu-cau&id-bai-viet=10997250&pid=CmsHienThiBaiViet_WAR_cmsportlet_INSTANCE_3ttomlB4UobM&reCall=1&pagedown=0"
   },
   {
-    title: "Exam Inspection Request",
-    description: "Request a review of your graded final examination paper.",
+    title: "Exam Paper Review / Exam Inspection Request",
     type: "FORM",
-    url: DUMMY_FORM_URL,
-    isTba: true
+    url: "https://forms.gle/iLsg84B1eP3EXYsh6"
   },
   {
-    title: "Step-back/Retake Exam Registration Form",
-    description: "Formally withdraw from an enrolled course or register for retake exam iterations under approved academic regulations.",
+    title: "Exam Registration",
     type: "FORM",
     url: "https://forms.gle/CkecUGbfnLmz5E5u6"
-  },
-  {
-    title: "Oral Exam Registration Form",
-    description: "Formal registration form for students requesting an oral supplementary examination.",
-    type: "FORM",
-    url: DUMMY_FORM_URL,
-    isTba: true
   }
 ];
 

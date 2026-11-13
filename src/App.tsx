@@ -787,6 +787,7 @@ export default function App() {
       case 'FileText': return <FileText className="w-4 h-4" />;
       case 'Calendar': return <Calendar className="w-4 h-4" />;
       case 'Cpu': return <Cpu className="w-4 h-4" />;
+      case 'Scale': return <Scale className="w-4 h-4" />;
       case 'ShieldAlert': return <ShieldAlert className="w-4 h-4" />;
       case 'ClipboardList': return <ClipboardList className="w-4 h-4" />;
       case 'Briefcase': return <Briefcase className="w-4 h-4" />;
@@ -1569,27 +1570,13 @@ export default function App() {
                             Program Academic Schedule
                           </h2>
                         </div>
-                        <span className={`text-xs font-medium ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                          Official timetables, lecture rooms & academic calendars
-                        </span>
                       </div>
 
                       {/* 1. Current & Upcoming Semesters */}
                       {filteredScheduleCards.length > 0 && (
                         <div className="space-y-3" id="active-schedules-group">
-                          <div className="flex items-center justify-between">
-                            <span className={`text-[11px] font-mono font-bold uppercase tracking-wider ${
-                              darkMode ? 'text-slate-400' : 'text-slate-600'
-                            }`}>
-                              Current & Upcoming Semesters
-                            </span>
-                            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-bold uppercase flex items-center gap-1.5">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                              Current: WS2026
-                            </span>
-                          </div>
 
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-5" id="schedule-cards-grid">
+                          <div className={`grid gap-5 ${filteredScheduleCards.length === 1 ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'}`} id="schedule-cards-grid">
                             {filteredScheduleCards.map((card, idx) => (
                               <PortalCardComponent key={idx} card={card} darkMode={darkMode} />
                             ))}
@@ -1631,9 +1618,6 @@ export default function App() {
                                         {STUDENT_LIST_RESOURCE.title}
                                       </h3>
                                     </div>
-                                    <p className={`text-[11px] mt-0.5 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                                      {STUDENT_LIST_RESOURCE.subtitle}
-                                    </p>
                                   </div>
                                 </div>
 
@@ -1684,11 +1668,6 @@ export default function App() {
                                         {filteredArchivedSchedules.length}
                                       </span>
                                     </div>
-                                    <p className={`text-[11px] mt-0.5 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                                      {isArchiveExpanded || query.trim().length > 0 
-                                        ? 'Click to collapse previous academic term timetables' 
-                                        : 'Click to view historical timetables & past records'}
-                                    </p>
                                   </div>
                                 </div>
 
@@ -1773,13 +1752,6 @@ export default function App() {
                             Examinations & Registration Portals
                           </h2>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <span className={`text-[11px] font-mono font-medium px-2.5 py-0.5 rounded-full border ${
-                            darkMode ? 'bg-slate-800/80 border-slate-700 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-600'
-                          }`}>
-                            Academic Year 2026 - 2027
-                          </span>
-                        </div>
                       </div>
 
                       {/* Examination Portal Cards */}
@@ -1808,6 +1780,9 @@ export default function App() {
                                 To qualify for final examinations under the official MEC study regulations:
                               </p>
                               <ul className="list-disc pl-4 space-y-1.5 text-xs">
+                                <li>
+                                  <strong>Exam Registration</strong>
+                                </li>
                                 <li>
                                   <strong>Compulsory Attendance (&ge; 80%):</strong> Attendance is strictly mandatory for <strong>Seminar</strong>, <strong>Laboratory practical</strong>, and <strong>Tutorial</strong>. Students must attend at least <strong>80% of the weekly semester hours</strong> specified for the course.
                                 </li>
@@ -2020,10 +1995,10 @@ export default function App() {
                                     </div>
                                     <div className="text-xs leading-relaxed">
                                       <div className={`font-semibold mb-0.5 ${darkMode ? 'text-amber-300' : 'text-amber-900'}`}>
-                                        Strict Deadline: 7 Days Prior to Exam Date
+                                        Strict Deadline: 3 Days Prior to Exam Date
                                       </div>
                                       <p className={darkMode ? 'text-slate-300' : 'text-slate-600'}>
-                                        The registration form will be <strong>strictly closed 7 calendar days</strong> before the final exam date. Late requests are rejected.
+                                        The registration form will be <strong>strictly closed 3 calendar days</strong> before the final exam date. Late requests are rejected.
                                       </p>
                                     </div>
                                   </div>
@@ -2331,10 +2306,10 @@ export default function App() {
                                     </div>
                                     <div className="text-xs leading-relaxed">
                                       <div className={`font-semibold mb-0.5 ${darkMode ? 'text-amber-300' : 'text-amber-900'}`}>
-                                        Strict Deadline: 7 Days Prior to Exam Date
+                                        Strict Deadline: 3 Days Prior to Exam Date
                                       </div>
                                       <p className={darkMode ? 'text-slate-300' : 'text-slate-600'}>
-                                        The registration form will be <strong>strictly closed 7 calendar days</strong> before the retake exam date. Late requests are rejected.
+                                        The registration form will be <strong>strictly closed 3 calendar days</strong> before the retake exam date. Late requests are rejected.
                                       </p>
                                     </div>
                                   </div>
@@ -2392,43 +2367,6 @@ export default function App() {
                         </div>
                       )}
 
-                      {/* Quick Link to German-Vietnamese Grade Conversion Scale */}
-                      <div className={`p-4 sm:p-5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
-                        darkMode 
-                          ? 'bg-gradient-to-r from-orange-950/20 via-slate-900/40 to-slate-900/20 border-orange-500/20 shadow-sm' 
-                          : 'bg-gradient-to-r from-orange-50/60 via-white to-orange-50/30 border-orange-200/80 shadow-xs'
-                      }`}>
-                        <div className="flex items-start gap-3.5">
-                          <div className="p-2 rounded-xl bg-orange-500/10 text-orange-500 flex-shrink-0 mt-0.5">
-                            <Scale className="w-5 h-5" />
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2 mb-0.5">
-                              <span className="px-2 py-0.5 text-[10px] font-mono font-bold uppercase rounded bg-orange-500/10 text-orange-500 border border-orange-500/20">
-                                Article 19 · Regulations
-                              </span>
-                              <h4 className={`text-xs sm:text-sm font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                                German & Vietnamese Grade Conversion Scale
-                              </h4>
-                            </div>
-                            <p className={`text-[11.5px] leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                              Official examination assessment standards converting German (1.0 – 5.0) to Vietnamese (10-point) scale, featuring interactive grade lookup.
-                            </p>
-                          </div>
-                        </div>
-                        <button
-                          type="button"
-                          id="btn-view-grade-scale-quick-link"
-                          onClick={() => {
-                            if (searchQuery) setSearchQuery('');
-                            navigateToTabAndScroll('regulations', 'section-grade-conversion-wrapper');
-                          }}
-                          className="px-3.5 py-2 rounded-xl text-xs font-bold bg-orange-500 hover:bg-orange-600 text-white transition-all shadow-sm hover:shadow flex items-center gap-2 self-start sm:self-center cursor-pointer whitespace-nowrap"
-                        >
-                          <span>View Grade Scale</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
                     </div>
                   )}
                 </div>
@@ -2530,11 +2468,12 @@ export default function App() {
                                     {[
                                       "Physics",
                                       "German",
-                                      "Engineering English",
                                       "IELTS Academic English",
                                       "Academic English",
                                       "Introduction to German Culture",
-                                      "Behavioural Foundations in Germany"
+                                      "Behavioural Foundations in Germany",
+                                      "Basic Internship (Design Section)",
+                                      "Basic Internship (Electrical Section)"
                                     ].map((subj, sIdx) => (
                                       <div 
                                         key={sIdx} 
@@ -2564,7 +2503,7 @@ export default function App() {
                                       Semester 1 (Year 1)
                                     </h4>
                                     <span className="px-2.5 py-0.5 text-[10px] font-mono font-bold rounded bg-orange-500/10 text-orange-400 border border-orange-500/25">
-                                      22 CP
+                                      33 CP
                                     </span>
                                   </div>
                                   <div className="space-y-2">
@@ -2573,8 +2512,8 @@ export default function App() {
                                       { name: "Programming techniques 1", cp: 5 },
                                       { name: "Mathematics 2", cp: 6 },
                                       { name: "Programming techniques 2", cp: 5 },
-                                      { name: "Basic Internship (Design Section)", cp: 0 },
-                                      { name: "Basic Internship (Electrical Section)", cp: 0 },
+                                      { name: "Engineering mechanics A", cp: 6 },
+                                      { name: "Electronics", cp: 5 },
                                       { name: "Basic Internship (Mechanical Section)", cp: 0 }
                                     ].map((mod, mIdx) => (
                                       <div key={mIdx} className={`p-2.5 rounded-lg border flex items-center justify-between ${
@@ -2606,7 +2545,7 @@ export default function App() {
                                       Semester 2 (Year 2)
                                     </h4>
                                     <span className="px-2.5 py-0.5 text-[10px] font-mono font-bold rounded bg-orange-500/10 text-orange-400 border border-orange-500/25">
-                                      37 CP
+                                      31 CP
                                     </span>
                                   </div>
                                   <div className="space-y-2">
@@ -2615,7 +2554,6 @@ export default function App() {
                                       { name: "Fundamental principles in electrical engineering 2", cp: 5 },
                                       { name: "Technical design 1", cp: 5 },
                                       { name: "Technical design 2", cp: 6 },
-                                      { name: "Engineering mechanics A", cp: 6 },
                                       { name: "Engineering mechanics B", cp: 5 },
                                       { name: "Automation 1", cp: 5 }
                                     ].map((mod, mIdx) => (
@@ -2644,7 +2582,7 @@ export default function App() {
                                       Semester 3 (Year 2)
                                     </h4>
                                     <span className="px-2.5 py-0.5 text-[10px] font-mono font-bold rounded bg-orange-500/10 text-orange-400 border border-orange-500/25">
-                                      31 CP
+                                      26 CP
                                     </span>
                                   </div>
                                   <div className="space-y-2">
@@ -2652,7 +2590,6 @@ export default function App() {
                                       { name: "Digital technology", cp: 5 },
                                       { name: "Mechatronic system 1", cp: 5 },
                                       { name: "Technical design 3", cp: 6 },
-                                      { name: "Electronics", cp: 5 },
                                       { name: "Material science", cp: 5 },
                                       { name: "Systems and software engineering", cp: 5 }
                                     ].map((mod, mIdx) => (
@@ -2825,7 +2762,7 @@ export default function App() {
                                       { name: "Adaptronics", cp: 5 },
                                       { name: "Electrical cabin systems", cp: 5 },
                                       { name: "Active chassis systems", cp: 5 },
-                                      { name: "Technology of fibre-reinforced composites", cp: 5 },
+                                      { name: "Technology of fiber-reinforced composites", cp: 5 },
                                       { name: "Simulation and identification of dynamic systems", cp: 5 }
                                     ].map((mod, mIdx) => (
                                       <div key={mIdx} className={`p-2.5 rounded-lg border border-emerald-500/10 flex items-center justify-between ${
@@ -2884,7 +2821,7 @@ export default function App() {
                                         <div>
                                           <span className={`block text-xs font-bold ${darkMode ? 'text-orange-200' : 'text-orange-800'}`}>{mod.name}</span>
                                           <span className={`block text-[10px] mt-0.5 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                                            {mod.name === "Industrial placement" ? "12-week professional internship block" : "Final capstone project & defense"}
+                                            {mod.name === "Industrial placement" ? "14-week professional internship block" : "Final capstone project & defense"}
                                           </span>
                                         </div>
                                         <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-orange-500/10 text-orange-400">
@@ -4207,7 +4144,7 @@ export default function App() {
                 Need help? Email the program office or come to <span className="font-extrabold text-slate-950 dark:text-white border-b border-orange-500/30 pb-0.5">Building 5, Room 527</span>.
               </p>
               <p className="font-mono text-[10.5px] font-bold tracking-wider text-slate-600 dark:text-slate-400 uppercase" id="footer-version-stamp">
-                Last updated: October 2026
+                Last updated: November 2026
               </p>
             </div>
           </div>

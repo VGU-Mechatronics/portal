@@ -30,7 +30,6 @@ import {
   Stethoscope,
   Briefcase,
   FileCheck,
-  Scale,
   Lock,
   Unlock,
   XCircle,
@@ -38,7 +37,6 @@ import {
   BookOpen,
   ExternalLink
 } from 'lucide-react';
-import GradeConversionTable from './GradeConversionTable';
 
 interface MecRegulationsOfficialProps {
   darkMode: boolean;
@@ -47,7 +45,6 @@ interface MecRegulationsOfficialProps {
 
 export default function MecRegulationsOfficial({ darkMode, searchQuery = '' }: MecRegulationsOfficialProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [showGradeConversion, setShowGradeConversion] = useState<boolean>(false);
 
   // Expanded accordion sections state - ordered logically
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
@@ -355,7 +352,7 @@ export default function MecRegulationsOfficial({ darkMode, searchQuery = '' }: M
         {/* ------------------------------------------------------------------------- */}
         {/* SECTION 2: Progression Gatekeeper — Modules M1 to M12 Requirement         */}
         {/* ------------------------------------------------------------------------- */}
-        {(selectedCategory === 'all' || selectedCategory === 'gatekeeper') && matchesSearch('m1 to m12 prerequisite participation admission third-year modules m25 m44 practical module first year gatekeeper') && (
+        {(selectedCategory === 'all' || selectedCategory === 'gatekeeper') && matchesSearch('m1 to m12 prerequisite participation admission third-year modules m25 m44 practical module first year gatekeeper ielts 6.0 80% ects foundation semester 15 august semester 2 defer gap year basic internship design electrical practice mechanical practice semester 4') && (
           <div className={`rounded-2xl border transition-all overflow-hidden ${
             darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
           }`} id="section-m1-m12-gatekeeper">
@@ -371,11 +368,8 @@ export default function MecRegulationsOfficial({ darkMode, searchQuery = '' }: M
                 </div>
                 <div>
                   <h3 className={`text-sm sm:text-base font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                    Progression Gatekeeper: Modules M1 to M12 Prerequisite
+                    Progression Milestones
                   </h3>
-                  <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                    Must pass all 12 first-year modules before taking Year 3 modules (M25&ndash;M44) or starting Sem 7 Practical Module
-                  </p>
                 </div>
               </div>
               {expandedSections['section-m1-m12-gatekeeper'] ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
@@ -385,7 +379,121 @@ export default function MecRegulationsOfficial({ darkMode, searchQuery = '' }: M
               <div className="p-5 sm:p-6 space-y-4">
                 {/* Condition => Result Progression Flow Bars */}
                 <div className="space-y-3">
-                  {/* Flow Bar 1: Year 3 Progression */}
+                  {/* Flow Bar 1: Foundation Semester -> Semester 2 Progression */}
+                  <div className={`p-4 rounded-xl border transition-all ${
+                    darkMode 
+                      ? 'bg-slate-950/50 border-slate-800' 
+                      : 'bg-slate-50/80 border-slate-200'
+                  }`}>
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4">
+                      {/* Condition */}
+                      <div className="flex items-center gap-3 md:w-[46%] min-w-0">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold shrink-0 border border-emerald-500/20">
+                          <CheckCircle2 className="w-5 h-5" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                              PREREQUISITE
+                            </span>
+                            <span className="text-[11px] font-semibold text-slate-500">By 15 August</span>
+                          </div>
+                          <div className="text-sm font-bold text-slate-900 dark:text-white mt-1">
+                            IELTS 6.0 + &ge; 80% Foundation ECTS
+                          </div>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">
+                            Hold IELTS 6.0 and achieve at least 80% of the accumulated ECTS in the Foundation Semester by 15 August
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Arrow / Action Divider */}
+                      <div className="flex items-center justify-center gap-1.5 py-1 px-3 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold text-xs shrink-0 self-start md:self-auto">
+                        <span>Unlocks</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </div>
+
+                      {/* Result */}
+                      <div className="flex items-center gap-3 md:w-[46%] min-w-0 md:justify-end md:text-right">
+                        <div className="min-w-0 order-2 md:order-1">
+                          <div className="flex items-center md:justify-end gap-1.5">
+                            <span className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400">Semester 2 Enrollment</span>
+                            <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
+                              OUTCOME
+                            </span>
+                          </div>
+                          <div className="text-sm font-bold text-indigo-600 dark:text-indigo-400 mt-1">
+                            Enroll in Semester 2
+                          </div>
+                          <p className="text-xs text-rose-600 dark:text-rose-400 font-medium">
+                            If not met: Defer / gap year for 1 academic year
+                          </p>
+                        </div>
+                        <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold shrink-0 border border-indigo-500/20 order-1 md:order-2">
+                          <Unlock className="w-5 h-5" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Flow Bar 2: Basic Internship -> Semester 4 Progression */}
+                  <div className={`p-4 rounded-xl border transition-all ${
+                    darkMode 
+                      ? 'bg-slate-950/50 border-slate-800' 
+                      : 'bg-slate-50/80 border-slate-200'
+                  }`}>
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4">
+                      {/* Condition */}
+                      <div className="flex items-center gap-3 md:w-[46%] min-w-0">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold shrink-0 border border-emerald-500/20">
+                          <CheckCircle2 className="w-5 h-5" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                              PREREQUISITE
+                            </span>
+                            <span className="text-[11px] font-semibold text-slate-500">Basic Internship</span>
+                          </div>
+                          <div className="text-sm font-bold text-slate-900 dark:text-white mt-1">
+                            Complete Basic Internship (All 3 Sub-modules)
+                          </div>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">
+                            Pass all three sub-modules: Design, Electrical Practice, and Mechanical Practice
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Arrow / Action Divider */}
+                      <div className="flex items-center justify-center gap-1.5 py-1 px-3 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold text-xs shrink-0 self-start md:self-auto">
+                        <span>Unlocks</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </div>
+
+                      {/* Result */}
+                      <div className="flex items-center gap-3 md:w-[46%] min-w-0 md:justify-end md:text-right">
+                        <div className="min-w-0 order-2 md:order-1">
+                          <div className="flex items-center md:justify-end gap-1.5">
+                            <span className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400">Semester 4 Enrollment</span>
+                            <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
+                              OUTCOME
+                            </span>
+                          </div>
+                          <div className="text-sm font-bold text-indigo-600 dark:text-indigo-400 mt-1">
+                            Enroll in Semester 4
+                          </div>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">
+                            Cleared to register and attend fourth-semester courses
+                          </p>
+                        </div>
+                        <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold shrink-0 border border-indigo-500/20 order-1 md:order-2">
+                          <Unlock className="w-5 h-5" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Flow Bar 3: Year 3 Progression */}
                   <div className={`p-4 rounded-xl border transition-all ${
                     darkMode 
                       ? 'bg-slate-950/50 border-slate-800' 
@@ -540,7 +648,7 @@ export default function MecRegulationsOfficial({ darkMode, searchQuery = '' }: M
                   <div className={`p-3 rounded-xl border ${darkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
                     <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Credit Cap</span>
                     <div className="flex items-baseline gap-1 mt-0.5">
-                      <span className="text-2xl font-black text-indigo-600 dark:text-indigo-400">6.0</span>
+                      <span className="text-2xl font-black text-indigo-600 dark:text-indigo-400">6</span>
                       <span className="text-xs font-semibold text-slate-500">CP Exact</span>
                     </div>
                   </div>
@@ -554,7 +662,7 @@ export default function MecRegulationsOfficial({ darkMode, searchQuery = '' }: M
                   <div className={`p-3 rounded-xl border border-rose-500/30 ${darkMode ? 'bg-rose-950/20' : 'bg-rose-50/60'}`}>
                     <span className="text-[10px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 block">Surplus Rollover</span>
                     <div className="flex items-baseline gap-1 mt-0.5">
-                      <span className="text-2xl font-black text-rose-600 dark:text-rose-400">0.0</span>
+                      <span className="text-2xl font-black text-rose-600 dark:text-rose-400">0</span>
                       <span className="text-xs font-semibold text-rose-600 dark:text-rose-400">CP (Forfeited)</span>
                     </div>
                   </div>
@@ -613,7 +721,7 @@ export default function MecRegulationsOfficial({ darkMode, searchQuery = '' }: M
                       Excess Example
                     </span>
                     <span className="text-slate-700 dark:text-slate-300">
-                      Subject A (4 CP) + Subject B (4 CP) = 8 CP &rarr; <strong>6 CP accepted, 2 CP strictly forfeited</strong>
+                      Subject A (4 CP) + Subject B (4 CP) = 8 CP &rarr; <strong>6 CP accepted, 2 CP forfeited</strong>
                     </span>
                   </div>
                 </div>
@@ -973,7 +1081,7 @@ export default function MecRegulationsOfficial({ darkMode, searchQuery = '' }: M
 
                   <div className={`p-3.5 rounded-xl border ${darkMode ? 'bg-slate-950/40 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
                     <span className="text-[10px] font-bold uppercase tracking-wider text-amber-500 block mb-1">Extension &amp; Grading</span>
-                    <strong className="block text-slate-900 dark:text-white mb-1">Max 6-Wk Extension &bull; 8-Wk Grading</strong>
+                    <strong className="block text-slate-900 dark:text-white mb-1">Max 6-Week Extension &bull; 8-Week Grading</strong>
                     <p className="text-slate-500 dark:text-slate-400">
                       Extension granted by Chair for good cause before deadline. Graded within 8 weeks of submission.
                     </p>
@@ -1135,7 +1243,7 @@ export default function MecRegulationsOfficial({ darkMode, searchQuery = '' }: M
             {expandedSections['section-attendance-rules'] && (
               <div className="p-5 sm:p-6 space-y-4">
                 {/* Section 8 Key Highlight Metrics */}
-                <div className="grid grid-cols-3 gap-2.5">
+                <div className="grid grid-cols-1 gap-2.5">
                   <div className={`p-3 rounded-xl border border-emerald-500/30 ${darkMode ? 'bg-emerald-950/20' : 'bg-emerald-50/60'}`}>
                     <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 block">Min Attendance</span>
                     <div className="flex items-baseline gap-1 mt-0.5">
@@ -1143,26 +1251,17 @@ export default function MecRegulationsOfficial({ darkMode, searchQuery = '' }: M
                       <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">Semester Hours</span>
                     </div>
                   </div>
-                  <div className={`p-3 rounded-xl border border-rose-500/30 ${darkMode ? 'bg-rose-950/20' : 'bg-rose-50/60'}`}>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 block">Max Missed Rate</span>
-                    <div className="flex items-baseline gap-1 mt-0.5">
-                      <span className="text-2xl font-black text-rose-600 dark:text-rose-400">&le; 20%</span>
-                      <span className="text-xs font-semibold text-rose-700 dark:text-rose-300">Total Hours</span>
-                    </div>
-                  </div>
-                  <div className={`p-3 rounded-xl border ${darkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Applicable Types</span>
-                    <div className="flex items-baseline gap-1 mt-0.5">
-                      <span className="text-2xl font-black text-orange-600 dark:text-orange-400">3</span>
-                      <span className="text-xs font-semibold text-slate-500">Seminar, Prak, &Uuml;b</span>
-                    </div>
-                  </div>
                 </div>
 
                 {/* 3 Course Types Visual Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
                   <div className={`p-4 rounded-xl border ${darkMode ? 'bg-slate-950/40 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
-                    <span className="font-bold text-slate-900 dark:text-white block mb-2">Mandatory Course Types</span>
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <span className="font-bold text-slate-900 dark:text-white">Mandatory Course Types (check module handbook)</span>
+                      <span className="px-2 py-0.5 text-[10px] font-bold uppercase rounded-md bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20 whitespace-nowrap shrink-0">
+                        3 Types
+                      </span>
+                    </div>
                     <ol className="space-y-2 text-slate-700 dark:text-slate-200 text-xs font-semibold list-none">
                       <li className="flex items-baseline gap-2">
                         <span className="text-emerald-600 dark:text-emerald-400">1.</span>
@@ -1170,7 +1269,7 @@ export default function MecRegulationsOfficial({ darkMode, searchQuery = '' }: M
                       </li>
                       <li className="flex items-baseline gap-2">
                         <span className="text-emerald-600 dark:text-emerald-400">2.</span>
-                        <span>Laboratory course (Prak) and</span>
+                        <span>Laboratory course (Prak)</span>
                       </li>
                       <li className="flex items-baseline gap-2">
                         <span className="text-emerald-600 dark:text-emerald-400">3.</span>
@@ -1443,48 +1542,6 @@ export default function MecRegulationsOfficial({ darkMode, searchQuery = '' }: M
 
       </div>
 
-      {/* ========================================================================= */}
-      {/* APPENDIX: German - Vietnamese Grade Conversion Table                      */}
-      {/* ========================================================================= */}
-      <div className={`p-5 sm:p-6 rounded-2xl border transition-all ${
-        darkMode ? 'bg-slate-900/40 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
-      }`} id="section-grade-conversion-table">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-lg bg-orange-500/10 text-orange-500">
-              <Scale className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className={`text-sm sm:text-base font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                Appendix: German &ndash; Vietnamese Grade Conversion Scale
-              </h3>
-              <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                Linear scale calibration between German marks (1.0 &ndash; 5.0) and Vietnamese marks (10.0 &ndash; 0.0)
-              </p>
-            </div>
-          </div>
-
-          <button
-            onClick={() => setShowGradeConversion(!showGradeConversion)}
-            className={`px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all flex items-center gap-2 ${
-              showGradeConversion
-                ? 'bg-orange-500 text-white border-orange-500 shadow-xs'
-                : darkMode
-                  ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
-                  : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
-            }`}
-          >
-            {showGradeConversion ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-            <span>{showGradeConversion ? 'Hide Conversion Scale' : 'View Grade Conversion Table'}</span>
-          </button>
-        </div>
-
-        {showGradeConversion && (
-          <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
-            <GradeConversionTable darkMode={darkMode} searchQuery={effectiveQuery} />
-          </div>
-        )}
-      </div>
     </div>
   );
 }
