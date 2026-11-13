@@ -1632,6 +1632,14 @@ export default function App() {
                                   </span>
                                 </div>
                               </a>
+                              <div className={`px-4 pb-3.5 pt-2.5 sm:px-5 sm:pb-4 border-t text-[11px] leading-relaxed ${
+                                darkMode ? 'border-slate-800/60 text-slate-400' : 'border-slate-100 text-slate-500'
+                              }`}>
+                                <ol className="space-y-0.5">
+                                  <li>1. Check the Student Group List for your assigned lab group.</li>
+                                  <li>2. Attend lab sessions according to your assigned group.</li>
+                                </ol>
+                              </div>
                             </div>
                           )}
 
