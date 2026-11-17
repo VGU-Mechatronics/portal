@@ -140,7 +140,7 @@ export const FORM_CARDS: PortalCard[] = [
   {
     title: "Exam Registration",
     type: "FORM",
-    url: "https://forms.gle/CkecUGbfnLmz5E5u6"
+    url: "https://forms.gle/srC9b4eH1U2CxtdFA"
   }
 ];
 
@@ -305,7 +305,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     answer: "Yes, attendance is mandatory (at least 80%) for certain types of classes: Seminar, Laboratory practical, and Tutorial.\n\nCheck Module Handbook for further details."
   },
   {
-    question: "Is registering for a module the same as registering for the exam?",
+    question: "If I am on a course’s Student List, am I automatically registered for the exam?",
     answer: "No. Being on a course’s Student List does NOT mean you are automatically included in the examination list.\n\nAll examinations require separate registration—for example, registering for a final exam or registering for a retake exam."
   },
   {
